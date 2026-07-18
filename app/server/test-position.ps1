@@ -36,10 +36,7 @@ function Invoke-Api {
         $data = if ($resp.Content) { $resp.Content | ConvertFrom-Json } else { $null }
     } catch {
         $status = [int]$_.Exception.Response.StatusCode.value__
-        $stream = $_.Exception.Response.GetResponseStream()
-        $reader = New-Object System.IO.StreamReader($stream)
-        $content = $reader.ReadToEnd()
-        $data = if ($content) { $content | ConvertFrom-Json } else { $null }
+        $data = if ($_.ErrorDetails.Message) { $_.ErrorDetails.Message | ConvertFrom-Json } else { $null }
     }
 
     if ($ExpectedStatus -ne 0 -and $status -ne $ExpectedStatus) {

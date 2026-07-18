@@ -1,0 +1,2 @@
+-- CreateSequence
+CREATE SEQUENCE IF NOT EXISTS "employee_code_seq" START WITH 1 INCREMENT BY 1;

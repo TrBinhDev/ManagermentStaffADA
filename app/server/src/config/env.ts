@@ -9,6 +9,7 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(1, 'JWT_ACCESS_SECRET is required'),
   JWT_REFRESH_SECRET: z.string().min(1, 'JWT_REFRESH_SECRET is required'),
   CLIENT_ORIGIN: z.string().default('http://localhost:8080'),
+  SECRET_KEY: z.string().min(1, 'SECRET_KEY is required'),
 });
 
 const parsed = envSchema.safeParse(process.env);

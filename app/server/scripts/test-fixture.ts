@@ -29,6 +29,9 @@ async function main() {
   } else if (cmd === 'delete-employee') {
     await prisma.employee.delete({ where: { id: arg } });
     console.log('deleted');
+  } else if (cmd === 'get-employee-profile') {
+    const profile = await prisma.employeeProfile.findUnique({ where: { employeeId: arg } });
+    console.log(JSON.stringify(profile));
   } else {
     throw new Error(`Unknown command: ${cmd}`);
   }
