@@ -1,0 +1,136 @@
+# ManagementStaffADA
+
+Hệ thống quản lý nhân viên nhà hàng — CRUD đơn giản, 2 role (`OWNER`, `MANAGER`), đăng nhập bằng email/password, dùng JWT access + refresh token.
+
+## Tech stack
+
+- **Backend:** Node.js, Express 5, TypeScript, Prisma ORM, PostgreSQL, Redis (session/refresh-token store)
+- **Auth:** JWT (access 15 phút / refresh 7 ngày, refresh token lưu ở httpOnly cookie), bcrypt cho password, AES-256-GCM cho dữ liệu nhạy cảm (CCCD), SHA-256 một chiều cho việc chống trùng CCCD
+- **Validate:** Zod
+- **Monorepo:** pnpm workspace
+
+## Cấu trúc thư mục
+
+```
+app/
+  server/            # Backend API (Express + Prisma)
+    prisma/          # schema.prisma + migrations
+    src/
+      config/        # env (zod-validated), prisma client, redis client
+      constants/     # httpStatus, jwt constants, message (lỗi tiếng Việt)
+      errors/        # AppError + các subclass (BadRequest/Unauthorized/Forbidden/NotFound/Conflict)
+      middlewares/    # authenticate, authorize, error handler, notFound
+      validators/    # validate() middleware (zod, hỗ trợ cả body lẫn query)
+      utils/         # asyncHandler, token (JWT), session (Redis), hash (SHA-256), crypto (AES-256-GCM)
+      modules/       # 1 folder / resource, mỗi folder có đủ: schema -> repository -> service -> controller -> routes
+        auth/
+        department/
+        position/
+        employee/
+        employee-profile/
+        manager-account/
+    scripts/         # script phụ trợ cho test (vd tạo/xóa record trực tiếp qua Prisma khi API liên quan chưa có)
+    test-*.ps1       # script test tay từng module (PowerShell), gọi API thật qua HTTP
+  web/               # Frontend (chưa code)
+docker/
+  docker-compose.yml # Postgres + Redis cho local dev
+```
+
+Quy ước module: mỗi resource là 1 folder trong `src/modules/`, gồm 5 file:
+- `*.schema.ts` — zod schema, luôn kèm type suy ra qua `z.infer`
+- `*.repository.ts` — chỉ chứa query Prisma thuần, không có business logic
+- `*.service.ts` — business logic, gọi qua repository của chính module đó (không gọi thẳng `prisma`)
+- `*.controller.ts` — mỏng, bọc `asyncHandler`, set status code
+- `*.routes.ts` — nối `validate()` + `authenticate`/`authorize` + controller
+
+## Yêu cầu môi trường
+
+- Node.js + pnpm
+- Docker (chạy Postgres + Redis local)
+
+## Cài đặt & chạy local
+
+```bash
+# 1. Cài dependency
+pnpm install
+
+# 2. Tạo file .env trong app/server (không commit, xem mẫu bên dưới)
+
+# 3. Bật Postgres + Redis
+pnpm docker:up
+
+# 4. Chạy migration
+pnpm --filter server exec prisma migrate deploy
+
+# 5. Seed tài khoản OWNER mẫu để test (owner@ada.local / Owner@123)
+pnpm --filter server run seed
+
+# 6. Chạy server (dev, tự reload)
+pnpm dev:server
+```
+
+Server chạy ở `http://localhost:3000` (đổi qua biến `PORT`).
+
+### Mẫu `.env` (đặt trong `app/server/.env`)
+
+```
+NODE_ENV=development
+PORT=3000
+
+DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<db>"
+REDIS_URL="redis://:<password>@localhost:6379"
+
+JWT_ACCESS_SECRET=<chuỗi bí mật>
+JWT_REFRESH_SECRET=<chuỗi bí mật>
+SECRET_KEY=<chuỗi bí mật, dùng để mã hóa CCCD>
+
+CLIENT_ORIGIN=http://localhost:8080
+```
+
+Và `docker/.env` (biến cho `docker-compose.yml`):
+
+```
+POSTGRES_USER=...
+POSTGRES_PASSWORD=...
+POSTGRES_DB=...
+REDIS_PASSWORD=...
+```
+
+## Script hay dùng (chạy ở root)
+
+| Lệnh | Ý nghĩa |
+|---|---|
+| `pnpm dev:server` | Chạy backend (watch mode) |
+| `pnpm docker:up` / `pnpm docker:down` | Bật/tắt Postgres + Redis |
+| `pnpm --filter server run seed` | Seed tài khoản OWNER mẫu |
+| `pnpm --filter server exec prisma migrate deploy` | Áp dụng migration |
+| `pnpm --filter server exec prisma studio` | Xem/sửa dữ liệu qua UI |
+
+## Các module API
+
+| Module | Quyền | Ghi chú |
+|---|---|---|
+| `auth` | OWNER/MANAGER | login, logout, refresh, `/me`, change-password. Refresh token ở httpOnly cookie, session lưu Redis (single-session/account) |
+| `department` | OWNER/MANAGER | CRUD phòng ban |
+| `position` | OWNER/MANAGER | CRUD vị trí, unique theo `(name, departmentId)` — 2 phòng ban khác nhau được trùng tên vị trí |
+| `employee` | OWNER/MANAGER | CRUD nhân viên, sinh `code` tự động (`NV0001...`), chống trùng CCCD qua hash, resign/rehire |
+| `employee-profile` | OWNER/MANAGER | Hồ sơ chi tiết nhân viên (CCCD mã hóa 2 chiều để hiển thị lại, địa chỉ, ngân hàng...) |
+| `manager-account` | **OWNER only** | Quản lý tài khoản đăng nhập của MANAGER — khóa tài khoản/đổi mật khẩu đều tự force-logout qua Redis |
+
+Chi tiết từng endpoint xem `api-list-v3-simple.md` ở root (lưu ý: file đó là bản nháp ban đầu, một số hành vi đã chỉnh trong lúc code — vd `Position` unique theo department chứ không unique toàn cục, `employee-profile` bỏ tính năng upload avatar).
+
+## Test
+
+Chưa có test tự động — mỗi module có 1 script PowerShell gọi thẳng API qua HTTP để test hồi quy tay:
+
+```powershell
+cd app/server
+powershell -File .\test-auth.ps1
+powershell -File .\test-department.ps1
+powershell -File .\test-position.ps1
+powershell -File .\test-employee.ps1
+powershell -File .\test-employee-profile.ps1
+powershell -File .\test-manager-account.ps1
+```
+
+Cần server đang chạy (`pnpm dev:server`) và đã seed tài khoản OWNER trước khi chạy.
