@@ -53,6 +53,8 @@ export async function create({ cccd, fullName, dob, positionId }: CreateEmployee
 
   const cccdEncrypted = encrypt(cccd);
   await employeeRepository.upsertProfileCccd(employee.id, cccdEncrypted);
+  await employeeRepository.createEmploymentPeriod(employee.id);
+  await employeeRepository.createPositionHistory(employee.id, positionId);
 
   return employee;
 }
@@ -70,7 +72,14 @@ export async function update(id: string, { fullName, dob, positionId }: UpdateEm
     }
   }
 
-  return employeeRepository.update(id, { fullName, dob, positionId });
+  const updated = await employeeRepository.update(id, { fullName, dob, positionId });
+
+  if (positionId && positionId !== employee.positionId) {
+    await employeeRepository.closeOpenPositionHistory(id);
+    await employeeRepository.createPositionHistory(id, positionId);
+  }
+
+  return updated;
 }
 
 export async function remove(id: string): Promise<void> {
@@ -92,7 +101,11 @@ export async function resign(id: string) {
     throw new BadRequestError(Message.EMPLOYEE.ALREADY_RESIGNED, 'ALREADY_RESIGNED');
   }
 
-  return employeeRepository.updateStatus(id, 'RESIGNED');
+  const updated = await employeeRepository.updateStatus(id, 'RESIGNED');
+  await employeeRepository.closeOpenPositionHistory(id);
+  await employeeRepository.closeOpenEmploymentPeriod(id);
+
+  return updated;
 }
 
 export async function rehire(id: string, { positionId }: RehireEmployeeInput) {
@@ -112,5 +125,9 @@ export async function rehire(id: string, { positionId }: RehireEmployeeInput) {
     }
   }
 
-  return employeeRepository.updateStatus(id, 'ACTIVE', positionId);
+  const updated = await employeeRepository.updateStatus(id, 'ACTIVE', positionId);
+  await employeeRepository.createEmploymentPeriod(id);
+  await employeeRepository.createPositionHistory(id, positionId ?? employee.positionId);
+
+  return updated;
 }

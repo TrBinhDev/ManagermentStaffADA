@@ -46,8 +46,8 @@ export function update(id: string, data: { name?: string; departmentId?: string 
   return prisma.position.update({ where: { id }, data, include: departmentSelect });
 }
 
-export function countEmployees(positionId: string) {
-  return prisma.employee.count({ where: { positionId } });
+export function countPositionHistory(positionId: string) {
+  return prisma.positionHistory.count({ where: { positionId } });
 }
 
 export function remove(id: string) {

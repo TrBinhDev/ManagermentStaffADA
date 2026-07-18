@@ -30,7 +30,11 @@
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-employee-profile.ps1)",
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-manager-account.ps1)",
       "Bash(xargs -n1 basename)",
-      "Bash(pnpm --filter server exec prisma migrate status)"
+      "Bash(pnpm --filter server exec prisma migrate status)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/auth/me --max-time 3)",
+      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-position-history-employment-period.ps1)",
+      "Bash(sed -i -E 's/^\\\\$\\(ph[1-4]|ep[1-4]\\) = Invoke-Api \\(.*\\)$/\\\\$\\\\1 = @\\(Invoke-Api \\\\2\\)/' test-position-history-employment-period.ps1)",
+      "Bash(grep -n '^\\\\$ph\\\\|^\\\\$ep' test-position-history-employment-period.ps1)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

@@ -25,6 +25,9 @@ async function main() {
         positionId: arg,
       },
     });
+    // Dong bo voi hanh vi API that: POST /employees luon mo kem 1 dong PositionHistory,
+    // neu khong Position se khong bi chan xoa dung nhu API that (chi con Restrict tho o DB).
+    await prisma.positionHistory.create({ data: { employeeId: employee.id, positionId: arg } });
     console.log(employee.id);
   } else if (cmd === 'delete-employee') {
     await prisma.employee.delete({ where: { id: arg } });

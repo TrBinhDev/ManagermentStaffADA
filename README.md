@@ -19,9 +19,9 @@ app/
       config/        # env (zod-validated), prisma client, redis client
       constants/     # httpStatus, jwt constants, message (lỗi tiếng Việt)
       errors/        # AppError + các subclass (BadRequest/Unauthorized/Forbidden/NotFound/Conflict)
-      middlewares/    # authenticate, authorize, error handler, notFound
+      middlewares/    # authenticate, authorize, error handler (kèm lưới an toàn cho lỗi FK Restrict thô từ Prisma), notFound
       validators/    # validate() middleware (zod, hỗ trợ cả body lẫn query)
-      utils/         # asyncHandler, token (JWT), session (Redis), hash (SHA-256), crypto (AES-256-GCM)
+      utils/         # asyncHandler, token (JWT), session (Redis), hash (SHA-256), crypto (AES-256-GCM), date (tính số ngày)
       modules/       # 1 folder / resource, mỗi folder có đủ: schema -> repository -> service -> controller -> routes
         auth/
         department/
@@ -29,6 +29,8 @@ app/
         employee/
         employee-profile/
         manager-account/
+        position-history/    # chỉ có repository/service/controller/routes (không có schema, GET thuần)
+        employment-period/   # tương tự position-history
     scripts/         # script phụ trợ cho test (vd tạo/xóa record trực tiếp qua Prisma khi API liên quan chưa có)
     test-*.ps1       # script test tay từng module (PowerShell), gọi API thật qua HTTP
   web/               # Frontend (chưa code)
@@ -116,8 +118,12 @@ REDIS_PASSWORD=...
 | `employee` | OWNER/MANAGER | CRUD nhân viên, sinh `code` tự động (`NV0001...`), chống trùng CCCD qua hash, resign/rehire |
 | `employee-profile` | OWNER/MANAGER | Hồ sơ chi tiết nhân viên (CCCD mã hóa 2 chiều để hiển thị lại, địa chỉ, ngân hàng...) |
 | `manager-account` | **OWNER only** | Quản lý tài khoản đăng nhập của MANAGER — khóa tài khoản/đổi mật khẩu đều tự force-logout qua Redis |
+| `position-history` | OWNER/MANAGER | `GET /employees/:id/position-history` — timeline các vị trí nhân viên đã/đang giữ, tự động ghi khi tạo/đổi vị trí/resign/rehire |
+| `employment-period` | OWNER/MANAGER | `GET /employees/:id/employment-periods` — timeline các đợt làm việc liên tục, reset khi rehire |
 
-Chi tiết từng endpoint xem `api-list-v3-simple.md` ở root (lưu ý: file đó là bản nháp ban đầu, một số hành vi đã chỉnh trong lúc code — vd `Position` unique theo department chứ không unique toàn cục, `employee-profile` bỏ tính năng upload avatar).
+`position-history`/`employment-period` không có API tạo/sửa riêng — chỉ đọc (`GET`), được ghi tự động bởi vòng đời `employee` (create/đổi vị trí/resign/rehire). Không lưu counter "số ngày" nào cả, chỉ lưu `startDate`/`endDate` (`endDate = null` nghĩa là đang mở) — số ngày luôn tính lúc đọc API bằng `(endDate ?? hiện tại) - startDate`, không cần job chạy nền. Vì lý do này, `Position` giờ bị chặn xóa (409) nếu **đã từng** xuất hiện trong `position-history`, kể cả khi hiện không còn ai giữ — không chỉ chặn khi có nhân viên đang giữ như trước.
+
+Chi tiết từng endpoint xem `api-list-v3-simple.md` ở root (lưu ý: file đó là bản nháp ban đầu, một số hành vi đã chỉnh trong lúc code — vd `Position` unique theo department chứ không unique toàn cục, `employee-profile` bỏ tính năng upload avatar, thêm `position-history`/`employment-period` không có trong bản gốc).
 
 ## Test
 
@@ -131,6 +137,7 @@ powershell -File .\test-position.ps1
 powershell -File .\test-employee.ps1
 powershell -File .\test-employee-profile.ps1
 powershell -File .\test-manager-account.ps1
+powershell -File .\test-position-history-employment-period.ps1
 ```
 
 Cần server đang chạy (`pnpm dev:server`) và đã seed tài khoản OWNER trước khi chạy.

@@ -10,6 +10,8 @@ import { positionRouter } from './modules/position/position.routes.js';
 import { employeeRouter } from './modules/employee/employee.routes.js';
 import { employeeProfileRouter } from './modules/employee-profile/employee-profile.routes.js';
 import { managerAccountRouter } from './modules/manager-account/manager-account.routes.js';
+import { positionHistoryRouter } from './modules/position-history/position-history.routes.js';
+import { employmentPeriodRouter } from './modules/employment-period/employment-period.routes.js';
 
 export const app = express();
 
@@ -23,6 +25,8 @@ app.use('/positions', positionRouter);
 app.use('/employees', employeeRouter);
 app.use('/employees', employeeProfileRouter);
 app.use('/manager-accounts', managerAccountRouter);
+app.use('/employees', positionHistoryRouter);
+app.use('/employees', employmentPeriodRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

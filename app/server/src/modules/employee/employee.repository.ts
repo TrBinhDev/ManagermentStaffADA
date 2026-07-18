@@ -98,3 +98,25 @@ export function updateStatus(id: string, status: EmployeeStatus, positionId?: st
 export function remove(id: string) {
   return prisma.employee.delete({ where: { id } });
 }
+
+export function createPositionHistory(employeeId: string, positionId: string) {
+  return prisma.positionHistory.create({ data: { employeeId, positionId } });
+}
+
+export function closeOpenPositionHistory(employeeId: string) {
+  return prisma.positionHistory.updateMany({
+    where: { employeeId, endDate: null },
+    data: { endDate: new Date() },
+  });
+}
+
+export function createEmploymentPeriod(employeeId: string) {
+  return prisma.employmentPeriod.create({ data: { employeeId } });
+}
+
+export function closeOpenEmploymentPeriod(employeeId: string) {
+  return prisma.employmentPeriod.updateMany({
+    where: { employeeId, endDate: null },
+    data: { endDate: new Date() },
+  });
+}

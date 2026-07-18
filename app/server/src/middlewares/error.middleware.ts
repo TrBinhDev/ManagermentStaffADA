@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { Prisma } from "@prisma/client";
 import { AppError } from "../errors/AppError.js";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { Message } from "../constants/message.js";
@@ -15,6 +16,17 @@ export function errorHandler(
         code: err.code,
         message: err.message,
         ...(err.details !== undefined ? { details: err.details } : {}),
+      },
+    });
+  }
+
+  // Luoi an toan: FK Restrict bi vi pham thang o DB (vd data tao tat qua fixture/script,
+  // khong di qua service check truoc) khong duoc de lo ra thanh 500 tho.
+  if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2003") {
+    return res.status(HttpStatus.CONFLICT).json({
+      error: {
+        code: "REFERENCED_BY_OTHER_DATA",
+        message: "Không thể thực hiện vì dữ liệu này đang được tham chiếu bởi dữ liệu khác",
       },
     });
   }

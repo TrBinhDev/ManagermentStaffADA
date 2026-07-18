@@ -45,8 +45,9 @@ model Position {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
-  employees  Employee[]
+  department        Department        @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  employees         Employee[]
+  positionHistories PositionHistory[]
 
   @@unique([name, departmentId])
 }
@@ -66,9 +67,11 @@ model Employee {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 
-  position       Position         @relation(fields: [positionId], references: [id], onDelete: Restrict)
-  profile        EmployeeProfile?
-  managerAccount ManagerAccount?
+  position          Position           @relation(fields: [positionId], references: [id], onDelete: Restrict)
+  profile           EmployeeProfile?
+  managerAccount    ManagerAccount?
+  positionHistories PositionHistory[]
+  employmentPeriods EmploymentPeriod[]
 }
 
 // ============================================================
@@ -127,4 +130,36 @@ model ManagerAccount {
   updatedAt    DateTime    @updatedAt
 
   employee Employee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+}
+
+// ============================================================
+// LỊCH SỬ VỊ TRÍ — theo dõi thời gian nhân viên giữ từng vị trí.
+// endDate = null nghĩa là đang giữ vị trí đó. Số ngày luôn tính lúc đọc
+// (endDate ?? now) - startDate, không lưu counter, không cần job nào chạy nền.
+// ============================================================
+
+model PositionHistory {
+  id         String    @id @default(uuid())
+  employeeId String
+  positionId String
+  startDate  DateTime  @default(now())
+  endDate    DateTime?
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  position Position @relation(fields: [positionId], references: [id], onDelete: Restrict)
+}
+
+// ============================================================
+// LỊCH SỬ GẮN BÓ CÔNG TY — theo dõi từng đợt làm việc liên tục.
+// endDate = null nghĩa là đang làm việc (đợt hiện tại). Resign đóng dòng
+// đang mở, rehire mở dòng mới hoàn toàn (số ngày gắn bó tính lại từ đầu).
+// ============================================================
+
+model EmploymentPeriod {
+  id         String    @id @default(uuid())
+  employeeId String
+  startDate  DateTime  @default(now())
+  endDate    DateTime?
+
+  employee Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 }

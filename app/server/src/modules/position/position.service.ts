@@ -67,8 +67,8 @@ export async function remove(id: string): Promise<void> {
     throw new NotFoundError(Message.POSITION.NOT_FOUND, 'POSITION_NOT_FOUND');
   }
 
-  const employeesCount = await positionRepository.countEmployees(id);
-  if (employeesCount > 0) {
+  const historyCount = await positionRepository.countPositionHistory(id);
+  if (historyCount > 0) {
     throw new ConflictError(Message.POSITION.HAS_EMPLOYEES, 'POSITION_HAS_EMPLOYEES');
   }
 
