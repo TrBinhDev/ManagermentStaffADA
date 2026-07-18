@@ -103,7 +103,7 @@ model EmployeeProfile {
   bankAccountNumber String?
   bankAccountHolder String?
 
-  avatarUrl String?
+  avatarUrl String? @default("/default-avatar.png")
   note      String? @db.Text
 
   createdAt DateTime @default(now())

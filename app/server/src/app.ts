@@ -8,6 +8,7 @@ import { authRouter } from './modules/auth/auth.routes.js';
 import { departmentRouter } from './modules/department/department.routes.js';
 import { positionRouter } from './modules/position/position.routes.js';
 import { employeeRouter } from './modules/employee/employee.routes.js';
+import { employeeProfileRouter } from './modules/employee-profile/employee-profile.routes.js';
 
 export const app = express();
 
@@ -19,6 +20,7 @@ app.use('/auth', authRouter);
 app.use('/departments', departmentRouter);
 app.use('/positions', positionRouter);
 app.use('/employees', employeeRouter);
+app.use('/employees', employeeProfileRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

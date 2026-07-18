@@ -39,6 +39,7 @@ export const Message = {
   EMPLOYEE_PROFILE: {
     INVALID_FILE_TYPE: "Chỉ chấp nhận file .jpg, .jpeg, .png, .webp",
     FILE_TOO_LARGE: "Dung lượng file tối đa 5MB",
+    CCCD_REQUIRED: "Cần cung cấp cccd để tạo hồ sơ nhân viên lần đầu",
   },
 
   MANAGER_ACCOUNT: {
