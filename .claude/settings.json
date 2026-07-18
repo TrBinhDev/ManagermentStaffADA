@@ -6,7 +6,21 @@
       "Read(//tmp/**)",
       "Bash(timeout 5 npx tsx src/server.ts)",
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-auth.ps1)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-department.ps1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/departments)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:3000/departments -H \"Content-Type: application/json\" -d '{\"name\":\"test\"}')",
+      "Bash(curl -s http://localhost:3000/auth/me)",
+      "Bash(netstat -ano)",
+      "Bash(wmic process *)",
+      "Bash(tasklist /FI \"PID eq 17104\" /V)",
+      "Bash(curl -s -o /dev/null -w \"GET /departments/  -> %{http_code}\\\\n\" http://localhost:3000/departments/)",
+      "Bash(curl -s -o /dev/null -w \"GET /departments/abc -> %{http_code}\\\\n\" http://localhost:3000/departments/abc)",
+      "Bash(curl -s -o /dev/null -w \"GET /auth -> %{http_code}\\\\n\" http://localhost:3000/auth)",
+      "Bash(curl -s -o /dev/null -w \"GET /auth/me -> %{http_code}\\\\n\" http://localhost:3000/auth/me)",
+      "Bash(curl -s -o /dev/null -w \"POST /auth/login -> %{http_code}\\\\n\" -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"a\",\"password\":\"b\"}')",
+      "Bash(taskkill //PID 17104 //F)",
+      "Bash(taskkill //PID 15920 //F)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"
