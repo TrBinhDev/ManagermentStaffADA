@@ -9,6 +9,7 @@ import { departmentRouter } from './modules/department/department.routes.js';
 import { positionRouter } from './modules/position/position.routes.js';
 import { employeeRouter } from './modules/employee/employee.routes.js';
 import { employeeProfileRouter } from './modules/employee-profile/employee-profile.routes.js';
+import { managerAccountRouter } from './modules/manager-account/manager-account.routes.js';
 
 export const app = express();
 
@@ -21,6 +22,7 @@ app.use('/departments', departmentRouter);
 app.use('/positions', positionRouter);
 app.use('/employees', employeeRouter);
 app.use('/employees', employeeProfileRouter);
+app.use('/manager-accounts', managerAccountRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

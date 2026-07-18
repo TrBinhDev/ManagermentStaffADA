@@ -27,7 +27,8 @@
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-position.ps1)",
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-auth.ps1; Write-Host \"`n`n===========`n\"; powershell -File .\\\\test-department.ps1)",
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-employee.ps1)",
-      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-employee-profile.ps1)"
+      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-employee-profile.ps1)",
+      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-manager-account.ps1)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"
