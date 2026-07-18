@@ -34,7 +34,21 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/auth/me --max-time 3)",
       "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-position-history-employment-period.ps1)",
       "Bash(sed -i -E 's/^\\\\$\\(ph[1-4]|ep[1-4]\\) = Invoke-Api \\(.*\\)$/\\\\$\\\\1 = @\\(Invoke-Api \\\\2\\)/' test-position-history-employment-period.ps1)",
-      "Bash(grep -n '^\\\\$ph\\\\|^\\\\$ep' test-position-history-employment-period.ps1)"
+      "Bash(grep -n '^\\\\$ph\\\\|^\\\\$ep' test-position-history-employment-period.ps1)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(chromium-cli --version)",
+      "Bash(node -e \"require.resolve\\('playwright'\\)\")",
+      "Bash(npm ls *)",
+      "Bash(curl -s -i -X OPTIONS http://localhost:3000/auth/login -H 'Origin: http://localhost:3001' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type')",
+      "Bash(curl -s -i -X OPTIONS http://localhost:3000/auth/login -H 'Origin: http://localhost:8080' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type')",
+      "Bash(cd /tmp)",
+      "Bash(rm -f cookies.txt)",
+      "Bash(curl -s -c cookies.txt -X POST http://localhost:3000/auth/login -H 'Origin: http://localhost:8080' -H 'Content-Type: application/json' -d '{\"email\":\"owner@ada.local\",\"password\":\"Owner@123\"}')",
+      "Bash(pnpm lint *)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\(x.id, x.name, x.department.name\\)\\)}\\)\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\(x.id, x.code, x.fullName\\)\\)}\\)\")",
+      "Bash(curl -s -o /dev/null -w \"/manager-accounts -> %{http_code}\\\\n\" http://localhost:8080/manager-accounts)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

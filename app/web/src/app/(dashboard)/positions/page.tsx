@@ -1,0 +1,210 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { usePositionStore } from "@/features/position/position.store";
+import { useDepartmentStore } from "@/features/department/department.store";
+import type { Position } from "@/features/position/position.types";
+import { useToast } from "@/components/toast/toast-context";
+import { useConfirm } from "@/components/confirm/confirm-context";
+import { getErrorMessage } from "@/lib/error";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+const ALL_DEPARTMENTS = "__all__";
+
+export default function PositionsPage() {
+  const { data, loading, fetchAll, create, update, remove } = usePositionStore();
+  const toast = useToast();
+  const confirm = useConfirm();
+  const departments = useDepartmentStore((s) => s.data);
+  const fetchDepartments = useDepartmentStore((s) => s.fetchAll);
+
+  const [name, setName] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [filterDepartmentId, setFilterDepartmentId] = useState<string | null>(null);
+
+  const [editTarget, setEditTarget] = useState<Position | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editDepartmentId, setEditDepartmentId] = useState("");
+  const [editError, setEditError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDepartments({ limit: 100 });
+  }, [fetchDepartments]);
+
+  useEffect(() => {
+    fetchAll(filterDepartmentId ? { departmentId: filterDepartmentId } : {});
+  }, [fetchAll, filterDepartmentId]);
+
+  async function handleCreate() {
+    if (!name.trim() || !departmentId) return;
+    try {
+      await create({ name: name.trim(), departmentId });
+      toast.success("Đã thêm vị trí");
+      setName("");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  function openEdit(pos: Position) {
+    setEditTarget(pos);
+    setEditName(pos.name);
+    setEditDepartmentId(pos.departmentId);
+    setEditError(null);
+  }
+
+  async function handleSaveEdit() {
+    if (!editTarget || !editName.trim() || !editDepartmentId) return;
+    try {
+      await update(editTarget.id, { name: editName.trim(), departmentId: editDepartmentId });
+      toast.success("Đã cập nhật vị trí");
+      setEditTarget(null);
+    } catch (err) {
+      setEditError(getErrorMessage(err));
+    }
+  }
+
+  async function handleRemove(id: string, name: string) {
+    const ok = await confirm({
+      title: "Xóa vị trí",
+      description: `Bạn có chắc chắn muốn xóa vị trí "${name}"? Không thể hoàn tác.`,
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
+
+    try {
+      await remove(id);
+      toast.success("Đã xóa vị trí");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <h1 className="text-xl font-semibold">Vị trí</h1>
+
+      <div className="space-y-1">
+        <p className="text-xs text-muted-foreground">Lọc theo phòng ban</p>
+        <Select
+          value={filterDepartmentId ?? ALL_DEPARTMENTS}
+          onValueChange={(v) => setFilterDepartmentId(v === ALL_DEPARTMENTS ? null : (v as string))}
+        >
+          <SelectTrigger className="w-48">
+            <SelectValue>
+              {(value: string) =>
+                value === ALL_DEPARTMENTS
+                  ? "Tất cả phòng ban"
+                  : (departments.find((d) => d.id === value)?.name ?? "Tất cả phòng ban")
+              }
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_DEPARTMENTS}>Tất cả phòng ban</SelectItem>
+            {departments.map((d) => (
+              <SelectItem key={d.id} value={d.id}>
+                {d.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-2 rounded-lg border p-3">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Tên vị trí</p>
+          <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Tên vị trí" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Phòng ban</p>
+          <Select value={departmentId} onValueChange={(v) => setDepartmentId(v as string)}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Chọn phòng ban">
+                {(value: string) => departments.find((d) => d.id === value)?.name ?? "Chọn phòng ban"}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {departments.map((d) => (
+                <SelectItem key={d.id} value={d.id}>
+                  {d.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={handleCreate}>Thêm</Button>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Tên</TableHead>
+            <TableHead>Phòng ban</TableHead>
+            <TableHead className="w-40" />
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.map((pos) => (
+            <TableRow key={pos.id}>
+              <TableCell>{pos.name}</TableCell>
+              <TableCell>{pos.department.name}</TableCell>
+              <TableCell className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => openEdit(pos)}>
+                  Sửa
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => handleRemove(pos.id, pos.name)}>
+                  Xóa
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+
+      <Dialog open={editTarget !== null} onOpenChange={(open) => !open && setEditTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sửa vị trí</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="editName">Tên vị trí</Label>
+              <Input id="editName" value={editName} onChange={(e) => setEditName(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>Phòng ban</Label>
+              <Select value={editDepartmentId} onValueChange={(v) => setEditDepartmentId(v as string)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue>
+                    {(value: string) => departments.find((d) => d.id === value)?.name ?? "Chọn phòng ban"}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>
+                      {d.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {editError && <p className="text-sm text-destructive">{editError}</p>}
+          </div>
+
+          <DialogFooter>
+            <Button onClick={handleSaveEdit}>Lưu</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
