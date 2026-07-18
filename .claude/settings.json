@@ -20,7 +20,12 @@
       "Bash(curl -s -o /dev/null -w \"GET /auth/me -> %{http_code}\\\\n\" http://localhost:3000/auth/me)",
       "Bash(curl -s -o /dev/null -w \"POST /auth/login -> %{http_code}\\\\n\" -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"a\",\"password\":\"b\"}')",
       "Bash(taskkill //PID 17104 //F)",
-      "Bash(taskkill //PID 15920 //F)"
+      "Bash(taskkill //PID 15920 //F)",
+      "Bash(mkdir -p prisma/migrations/20260718080604_position_unique_per_department)",
+      "Bash(npx prisma *)",
+      "Bash(tasklist)",
+      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-position.ps1)",
+      "PowerShell(cd \"F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File .\\\\test-auth.ps1; Write-Host \"`n`n===========`n\"; powershell -File .\\\\test-department.ps1)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

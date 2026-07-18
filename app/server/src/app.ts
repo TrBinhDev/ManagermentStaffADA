@@ -6,6 +6,7 @@ import { errorHandler } from './middlewares/error.middleware.js';
 import { notFoundHandler } from './middlewares/notFound.middleware.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { departmentRouter } from './modules/department/department.routes.js';
+import { positionRouter } from './modules/position/position.routes.js';
 
 export const app = express();
 
@@ -15,6 +16,7 @@ app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/departments', departmentRouter);
+app.use('/positions', positionRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

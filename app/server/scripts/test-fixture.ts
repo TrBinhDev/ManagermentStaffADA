@@ -1,6 +1,6 @@
-// Script chi dung cho test thu cong (test-department.ps1), khong phai code app.
-// Position module chua code nen can insert/xoa truc tiep qua Prisma de test case
-// DELETE /departments/:id bi chan boi Restrict khi con Position tham chieu.
+// Script chi dung cho test thu cong (test-department.ps1, test-position.ps1), khong phai code app.
+// Cac module lien quan (position, employee) chua code het nen can insert/xoa truc tiep
+// qua Prisma de test cac case DELETE bi chan boi Restrict khi con record tham chieu.
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -14,6 +14,20 @@ async function main() {
     console.log(position.id);
   } else if (cmd === 'delete-position') {
     await prisma.position.delete({ where: { id: arg } });
+    console.log('deleted');
+  } else if (cmd === 'create-employee') {
+    const stamp = Date.now().toString();
+    const employee = await prisma.employee.create({
+      data: {
+        code: `TEST-${stamp}`,
+        cccdHash: `test-hash-${stamp}`,
+        fullName: 'Test Employee Fixture',
+        positionId: arg,
+      },
+    });
+    console.log(employee.id);
+  } else if (cmd === 'delete-employee') {
+    await prisma.employee.delete({ where: { id: arg } });
     console.log('deleted');
   } else {
     throw new Error(`Unknown command: ${cmd}`);
