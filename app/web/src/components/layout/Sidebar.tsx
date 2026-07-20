@@ -25,7 +25,12 @@ const NAV_ITEMS = [
   { href: ROUTES.workSchedule, label: "Lịch làm việc", icon: CalendarDays },
   { href: ROUTES.payments, label: "Lương", icon: Wallet },
   { href: ROUTES.employees, label: "Nhân viên", icon: Users },
-  { href: ROUTES.managerAccounts, label: "Tài khoản quản lý", icon: ShieldCheck, ownerOnly: true },
+  {
+    href: ROUTES.managerAccounts,
+    label: "Tài khoản quản lý",
+    icon: ShieldCheck,
+    ownerOnly: true,
+  },
   { href: ROUTES.settings, label: "Cài đặt", icon: Settings },
 ];
 
@@ -36,36 +41,41 @@ export function Sidebar() {
 
   return (
     <aside className="relative z-10 flex w-60 flex-col gap-1 border-r border-sidebar-border bg-sidebar/80 p-4 backdrop-blur-xl">
-      <div className="mb-4 flex items-center gap-2 px-2 py-1">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-primary to-accent text-primary-foreground shadow-sm shadow-primary/30">
-          <UtensilsCrossed className="size-4" />
-        </div>
-        <span className="text-sm font-semibold tracking-tight">ManagementStaffADA</span>
+      <div className="mb-4 px-2 py-1">
+        <h1 className="text-lg font-extrabold tracking-tight">
+          <span className="text-foreground">Management</span>{" "}
+          <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+            Staff ADA
+          </span>
+        </h1>
       </div>
 
-      {NAV_ITEMS.filter((item) => !item.ownerOnly || role === "OWNER").map((item) => {
-        const active = pathname.startsWith(item.href);
-        const Icon = item.icon;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
-            )}
-          >
-            <span
+      {NAV_ITEMS.filter((item) => !item.ownerOnly || role === "OWNER").map(
+        (item) => {
+          const active = pathname.startsWith(item.href);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
               className={cn(
-                "absolute top-1/2 left-0 h-0 w-0.5 -translate-y-1/2 rounded-full bg-linear-to-b from-primary to-accent transition-all duration-200",
-                active && "h-5",
+                "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                active &&
+                  "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
               )}
-            />
-            <Icon className="size-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
-            {item.label}
-          </Link>
-        );
-      })}
+            >
+              <span
+                className={cn(
+                  "absolute top-1/2 left-0 h-0 w-0.5 -translate-y-1/2 rounded-full bg-linear-to-b from-primary to-accent transition-all duration-200",
+                  active && "h-5",
+                )}
+              />
+              <Icon className="size-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
+              {item.label}
+            </Link>
+          );
+        },
+      )}
 
       <button
         onClick={() => logout()}
