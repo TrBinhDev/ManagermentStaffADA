@@ -49,6 +49,13 @@ export const Message = {
     POSITION_NOT_FOUND: "Vị trí không tồn tại",
   },
 
+  SHIFT: {
+    NOT_FOUND: "Không tìm thấy ca làm việc",
+    NAME_EXISTS: "Tên ca làm việc đã tồn tại",
+    HAS_WORK_SCHEDULE:
+      "Không thể xóa vì ca này đã có trong lịch làm việc, dùng Ẩn thay vì xóa",
+  },
+
   MANAGER_ACCOUNT: {
     NOT_FOUND: "Không tìm thấy tài khoản",
     EMAIL_EXISTS: "Email đã được sử dụng",

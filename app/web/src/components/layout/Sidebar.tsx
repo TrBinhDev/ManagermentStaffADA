@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   UtensilsCrossed,
+  Clock,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { ROUTES } from "@/constants/routes";
@@ -18,6 +19,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: ROUTES.departments, label: "Phòng ban", icon: Building2 },
   { href: ROUTES.positions, label: "Vị trí", icon: Briefcase },
+  { href: ROUTES.shifts, label: "Ca làm việc", icon: Clock },
   { href: ROUTES.employees, label: "Nhân viên", icon: Users },
   { href: ROUTES.managerAccounts, label: "Tài khoản quản lý", icon: ShieldCheck, ownerOnly: true },
   { href: ROUTES.settings, label: "Cài đặt", icon: Settings },
