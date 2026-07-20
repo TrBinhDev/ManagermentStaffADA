@@ -61,7 +61,12 @@
       "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-employee-profile.ps1 2>&1 | Select-Object -Last 120)",
       "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-manager-account.ps1 2>&1 | Select-Object -Last 150)",
       "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-position-history-employment-period.ps1 2>&1 | Select-Object -Last 150)",
-      "Bash(git status *)"
+      "Bash(git status *)",
+      "Bash(ls -la \"/c/Users/Admin/.claude/projects/f--Project-ManagermentStaffADA/memory/\" 2>&1)",
+      "Read(//c/Users/Admin/.claude/projects/f--Project-ManagermentStaffADA/memory//**)",
+      "Bash(curl -s -o /dev/null -w \"GET /positions -> %{http_code}\\\\n\" http://localhost:3000/positions)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-position-salary-rate.ps1 2>&1 | Select-Object -Last 100)",
+      "Bash(node -e \"console.log\\(new Date\\(\\).toString\\(\\)\\); console.log\\(Intl.DateTimeFormat\\(\\).resolvedOptions\\(\\).timeZone\\)\")"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

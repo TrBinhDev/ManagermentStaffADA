@@ -35,6 +35,12 @@ async function main() {
   } else if (cmd === 'get-employee-profile') {
     const profile = await prisma.employeeProfile.findUnique({ where: { employeeId: arg } });
     console.log(JSON.stringify(profile));
+  } else if (cmd === 'force-delete-position') {
+    // Position con PositionSalaryRate bi chan xoa qua API (dung, khong phai bug) —
+    // fixture nay xoa thang qua Prisma de don dep sau khi test xong.
+    await prisma.positionSalaryRate.deleteMany({ where: { positionId: arg } });
+    await prisma.position.delete({ where: { id: arg } });
+    console.log('deleted');
   } else {
     throw new Error(`Unknown command: ${cmd}`);
   }

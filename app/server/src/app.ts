@@ -12,6 +12,7 @@ import { employeeProfileRouter } from './modules/employee-profile/employee-profi
 import { managerAccountRouter } from './modules/manager-account/manager-account.routes.js';
 import { positionHistoryRouter } from './modules/position-history/position-history.routes.js';
 import { employmentPeriodRouter } from './modules/employment-period/employment-period.routes.js';
+import { positionSalaryRateRouter } from './modules/position-salary-rate/position-salary-rate.routes.js';
 
 export const app = express();
 
@@ -27,6 +28,7 @@ app.use('/employees', employeeProfileRouter);
 app.use('/manager-accounts', managerAccountRouter);
 app.use('/employees', positionHistoryRouter);
 app.use('/employees', employmentPeriodRouter);
+app.use('/positions', positionSalaryRateRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

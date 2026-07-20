@@ -45,6 +45,10 @@ export const Message = {
     CCCD_REQUIRED: "Cần cung cấp cccd để tạo hồ sơ nhân viên lần đầu",
   },
 
+  POSITION_SALARY_RATE: {
+    POSITION_NOT_FOUND: "Vị trí không tồn tại",
+  },
+
   MANAGER_ACCOUNT: {
     NOT_FOUND: "Không tìm thấy tài khoản",
     EMAIL_EXISTS: "Email đã được sử dụng",
