@@ -1,6 +1,9 @@
 "use client";
 
 import { use, useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/features/auth/auth.store";
 import * as employeeApi from "@/features/employee/employee.api";
 import type { EmployeeDetail } from "@/features/employee/employee.types";
@@ -45,6 +48,16 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Link
+          href={ROUTES.employees}
+          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Quay lại
+        </Link>
+      </div>
+
       <h1 className="text-xl font-semibold">Chi tiết nhân viên</h1>
 
       <div className="flex gap-1 border-b">
@@ -564,6 +577,13 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
     return attendanceRows.find((a) => a.shiftId === shiftId && a.workDate.slice(0, 10) === workDate.slice(0, 10));
   }
 
+  function isFutureDay(workDate: string) {
+    const d = new Date(workDate);
+    const workDateUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    return workDateUTC > todayUTC;
+  }
+
   async function handleCheckIn(shiftId: string, workDate: string) {
     try {
       await attendanceApi.checkIn({ employeeId, shiftId, workDate: workDate.slice(0, 10) });
@@ -629,7 +649,13 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
                 </TableCell>
                 <TableCell>
                   {!attendance && (
-                    <Button size="sm" variant="outline" onClick={() => handleCheckIn(row.shiftId, row.workDate)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={isFutureDay(row.workDate)}
+                      title={isFutureDay(row.workDate) ? "Chưa đến ngày làm việc, chưa thể chấm công" : undefined}
+                      onClick={() => handleCheckIn(row.shiftId, row.workDate)}
+                    >
                       Chấm công vào
                     </Button>
                   )}

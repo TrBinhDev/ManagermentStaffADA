@@ -23,7 +23,7 @@ export const useShiftStore = create<ShiftState>((set, get) => {
     data: [],
     total: 0,
     page: 1,
-    limit: 20,
+    limit: 8,
     loading: false,
     error: null,
 

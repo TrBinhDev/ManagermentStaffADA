@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -28,7 +29,7 @@ import {
 const ALL_DEPARTMENTS = "__all__";
 
 export default function EmployeesPage() {
-  const { data, loading, fetchAll, create, update, resign, rehire } = useEmployeeStore();
+  const { data, total, page, limit, loading, fetchAll, create, update, resign, rehire } = useEmployeeStore();
   const toast = useToast();
   const confirm = useConfirm();
   const currentEmployeeId = useAuthStore((s) => s.user?.employeeId ?? null);
@@ -40,6 +41,7 @@ export default function EmployeesPage() {
   const [status, setStatus] = useState<EmployeeStatus | "ALL">("ACTIVE");
   const [departmentId, setDepartmentId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [requestedPage, setRequestedPage] = useState(1);
 
   const [open, setOpen] = useState(false);
   const [cccd, setCccd] = useState("");
@@ -60,12 +62,19 @@ export default function EmployeesPage() {
   }, [fetchPositions, fetchDepartments]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- doi filter thi ve lai trang 1
+    setRequestedPage(1);
+  }, [status, departmentId, search]);
+
+  useEffect(() => {
     fetchAll({
       status: status === "ALL" ? undefined : status,
       departmentId: departmentId ?? undefined,
       search: search || undefined,
+      page: requestedPage,
+      limit: 8,
     });
-  }, [fetchAll, status, departmentId, search]);
+  }, [fetchAll, status, departmentId, search, requestedPage]);
 
   async function handleCreate() {
     setFormError(null);
@@ -275,6 +284,8 @@ export default function EmployeesPage() {
       </Table>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+
+      <PaginationBar page={page} total={total} limit={limit} itemLabel="nhân viên" onPageChange={setRequestedPage} />
 
       <Dialog open={editTarget !== null} onOpenChange={(v) => !v && setEditTarget(null)}>
         <DialogContent>

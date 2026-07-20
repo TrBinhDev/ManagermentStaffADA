@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,7 +23,7 @@ const ALL_DEPARTMENTS = "__all__";
 const ALL_STATUS = "__all_status__";
 
 export default function PositionsPage() {
-  const { data, loading, fetchAll, create, update, remove } = usePositionStore();
+  const { data, total, page, limit, loading, fetchAll, create, update, remove } = usePositionStore();
   const toast = useToast();
   const confirm = useConfirm();
   const role = useAuthStore((s) => s.role);
@@ -33,6 +34,7 @@ export default function PositionsPage() {
   const [departmentId, setDepartmentId] = useState("");
   const [filterDepartmentId, setFilterDepartmentId] = useState<string | null>(null);
   const [filterIsActive, setFilterIsActive] = useState<boolean | null>(null);
+  const [requestedPage, setRequestedPage] = useState(1);
 
   const [editTarget, setEditTarget] = useState<Position | null>(null);
   const [editName, setEditName] = useState("");
@@ -53,11 +55,18 @@ export default function PositionsPage() {
   }, [fetchDepartments]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- doi filter thi ve lai trang 1
+    setRequestedPage(1);
+  }, [filterDepartmentId, filterIsActive]);
+
+  useEffect(() => {
     fetchAll({
       departmentId: filterDepartmentId ?? undefined,
       isActive: filterIsActive ?? undefined,
+      page: requestedPage,
+      limit: 8,
     });
-  }, [fetchAll, filterDepartmentId, filterIsActive]);
+  }, [fetchAll, filterDepartmentId, filterIsActive, requestedPage]);
 
   async function handleCreate() {
     if (!name.trim() || !departmentId) return;
@@ -255,6 +264,8 @@ export default function PositionsPage() {
       </Table>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+
+      <PaginationBar page={page} total={total} limit={limit} itemLabel="vị trí" onPageChange={setRequestedPage} />
 
       <Dialog open={editTarget !== null} onOpenChange={(open) => !open && setEditTarget(null)}>
         <DialogContent>

@@ -83,7 +83,9 @@
       "Bash(cat)",
       "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-attendance.ps1 2>&1 | Select-Object -Last 200)",
       "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/attendance)",
-      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/payments)"
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/payments)",
+      "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/employees)",
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/positions)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

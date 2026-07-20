@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,7 +21,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 const ALL_STATUS = "__all_status__";
 
 export default function ShiftsPage() {
-  const { data, loading, fetchAll, create, update, remove } = useShiftStore();
+  const { data, total, page, limit, loading, fetchAll, create, update, remove } = useShiftStore();
   const toast = useToast();
   const confirm = useConfirm();
   const positions = usePositionStore((s) => s.data);
@@ -30,6 +31,7 @@ export default function ShiftsPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [filterIsActive, setFilterIsActive] = useState<boolean | null>(null);
+  const [requestedPage, setRequestedPage] = useState(1);
 
   const [editTarget, setEditTarget] = useState<Shift | null>(null);
   const [editName, setEditName] = useState("");
@@ -48,8 +50,13 @@ export default function ShiftsPage() {
   } = useShiftPositionCapacities(capacityTarget?.id ?? null);
 
   useEffect(() => {
-    fetchAll({ isActive: filterIsActive ?? undefined });
-  }, [fetchAll, filterIsActive]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- doi filter thi ve lai trang 1
+    setRequestedPage(1);
+  }, [filterIsActive]);
+
+  useEffect(() => {
+    fetchAll({ isActive: filterIsActive ?? undefined, page: requestedPage, limit: 8 });
+  }, [fetchAll, filterIsActive, requestedPage]);
 
   useEffect(() => {
     fetchPositions({ limit: 100, isActive: true });
@@ -249,6 +256,8 @@ export default function ShiftsPage() {
       </Table>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+
+      <PaginationBar page={page} total={total} limit={limit} itemLabel="ca làm việc" onPageChange={setRequestedPage} />
 
       <Dialog open={editTarget !== null} onOpenChange={(open) => !open && setEditTarget(null)}>
         <DialogContent>

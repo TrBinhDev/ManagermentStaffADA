@@ -20,7 +20,7 @@ export const useDepartmentStore = create<DepartmentState>((set, get) => ({
   data: [],
   total: 0,
   page: 1,
-  limit: 20,
+  limit: 8,
   loading: false,
   error: null,
 

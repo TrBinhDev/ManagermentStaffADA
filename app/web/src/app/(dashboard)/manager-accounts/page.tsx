@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -44,7 +45,8 @@ export default function ManagerAccountsPage() {
 }
 
 function ManagerAccountsContent() {
-  const { data, loading, fetchAll, create, setActive, resetPassword, remove } = useManagerAccountStore();
+  const { data, total, page, limit, loading, fetchAll, create, setActive, resetPassword, remove } =
+    useManagerAccountStore();
   const toast = useToast();
   const confirm = useConfirm();
   const employees = useEmployeeStore((s) => s.data);
@@ -55,14 +57,18 @@ function ManagerAccountsContent() {
   const [password, setPassword] = useState("");
   const [employeeId, setEmployeeId] = useState(NONE_EMPLOYEE);
   const [formError, setFormError] = useState<string | null>(null);
+  const [requestedPage, setRequestedPage] = useState(1);
 
   const [resetTarget, setResetTarget] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    fetchAll();
+    fetchAll({ page: requestedPage, limit: 8 });
+  }, [fetchAll, requestedPage]);
+
+  useEffect(() => {
     fetchEmployees({ status: "ACTIVE", limit: 100 });
-  }, [fetchAll, fetchEmployees]);
+  }, [fetchEmployees]);
 
   async function handleCreate() {
     setFormError(null);
@@ -236,6 +242,8 @@ function ManagerAccountsContent() {
       </Table>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+
+      <PaginationBar page={page} total={total} limit={limit} itemLabel="tài khoản" onPageChange={setRequestedPage} />
 
       <Dialog open={resetTarget !== null} onOpenChange={(v) => !v && setResetTarget(null)}>
         <DialogContent>

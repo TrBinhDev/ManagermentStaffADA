@@ -9,6 +9,7 @@ import { getErrorMessage } from "@/lib/error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PaginationBar } from "@/components/ui/pagination-bar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Dialog,
@@ -19,18 +20,19 @@ import {
 } from "@/components/ui/dialog";
 
 export default function DepartmentsPage() {
-  const { data, loading, fetchAll, create, update, remove } = useDepartmentStore();
+  const { data, total, page, limit, loading, fetchAll, create, update, remove } = useDepartmentStore();
   const toast = useToast();
   const confirm = useConfirm();
   const [name, setName] = useState("");
+  const [requestedPage, setRequestedPage] = useState(1);
 
   const [editTarget, setEditTarget] = useState<Department | null>(null);
   const [editName, setEditName] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    fetchAll({ page: requestedPage, limit: 8 });
+  }, [fetchAll, requestedPage]);
 
   async function handleCreate() {
     if (!name.trim()) return;
@@ -116,6 +118,8 @@ export default function DepartmentsPage() {
       </Table>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+
+      <PaginationBar page={page} total={total} limit={limit} itemLabel="phòng ban" onPageChange={setRequestedPage} />
 
       <Dialog open={editTarget !== null} onOpenChange={(open) => !open && setEditTarget(null)}>
         <DialogContent>
