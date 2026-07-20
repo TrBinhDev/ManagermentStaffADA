@@ -71,7 +71,9 @@
       "Bash(curl -s -o /dev/null -w \"frontend http_code=%{http_code}\\\\n\" http://localhost:8080)",
       "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-shift.ps1 2>&1 | Select-Object -Last 100)",
       "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/shifts)",
-      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/shifts)"
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/shifts)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-shift-position-capacity.ps1 2>&1 | Select-Object -Last 150)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-shift-position-capacity.ps1 2>&1 | Select-Object -Last 30)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

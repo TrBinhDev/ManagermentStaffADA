@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useShiftStore } from "@/features/shift/shift.store";
 import type { Shift } from "@/features/shift/shift.types";
+import { usePositionStore } from "@/features/position/position.store";
+import { useShiftPositionCapacities } from "@/features/shift-position-capacity/use-shift-position-capacity";
+import * as capacityApi from "@/features/shift-position-capacity/shift-position-capacity.api";
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
 import { getErrorMessage } from "@/lib/error";
@@ -20,6 +23,8 @@ export default function ShiftsPage() {
   const { data, loading, fetchAll, create, update, remove } = useShiftStore();
   const toast = useToast();
   const confirm = useConfirm();
+  const positions = usePositionStore((s) => s.data);
+  const fetchPositions = usePositionStore((s) => s.fetchAll);
 
   const [name, setName] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -32,9 +37,23 @@ export default function ShiftsPage() {
   const [editEndTime, setEditEndTime] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
 
+  const [capacityTarget, setCapacityTarget] = useState<Shift | null>(null);
+  const [newCapPositionId, setNewCapPositionId] = useState("");
+  const [newCapMaxStaff, setNewCapMaxStaff] = useState("");
+  const [capacityError, setCapacityError] = useState<string | null>(null);
+  const {
+    data: capacities,
+    loading: capacitiesLoading,
+    refetch: refetchCapacities,
+  } = useShiftPositionCapacities(capacityTarget?.id ?? null);
+
   useEffect(() => {
     fetchAll({ isActive: filterIsActive ?? undefined });
   }, [fetchAll, filterIsActive]);
+
+  useEffect(() => {
+    fetchPositions({ limit: 100, isActive: true });
+  }, [fetchPositions]);
 
   async function handleCreate() {
     if (!name.trim() || !startTime || !endTime) return;
@@ -72,6 +91,62 @@ export default function ShiftsPage() {
     try {
       await update(shift.id, { isActive: !shift.isActive });
       toast.success(shift.isActive ? "Đã ẩn ca làm việc" : "Đã hiện lại ca làm việc");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  function openCapacities(shift: Shift) {
+    setCapacityTarget(shift);
+    setNewCapPositionId("");
+    setNewCapMaxStaff("");
+    setCapacityError(null);
+  }
+
+  async function handleCreateCapacity() {
+    if (!capacityTarget) return;
+    const maxStaff = Number(newCapMaxStaff);
+    if (!newCapPositionId || !newCapMaxStaff || !Number.isInteger(maxStaff) || maxStaff <= 0) {
+      setCapacityError("Chọn vị trí và nhập giới hạn số người lớn hơn 0");
+      return;
+    }
+    setCapacityError(null);
+    try {
+      await capacityApi.createCapacity(capacityTarget.id, { positionId: newCapPositionId, maxStaff });
+      toast.success("Đã thêm giới hạn số người");
+      setNewCapPositionId("");
+      setNewCapMaxStaff("");
+      await refetchCapacities();
+    } catch (err) {
+      setCapacityError(getErrorMessage(err));
+    }
+  }
+
+  async function handleUpdateCapacity(capacityId: string, maxStaff: number) {
+    if (!capacityTarget) return;
+    try {
+      await capacityApi.updateCapacity(capacityTarget.id, capacityId, { maxStaff });
+      toast.success("Đã cập nhật giới hạn số người");
+      await refetchCapacities();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  async function handleDeleteCapacity(capacityId: string) {
+    if (!capacityTarget) return;
+    const ok = await confirm({
+      title: "Xóa giới hạn số người",
+      description: "Bạn có chắc chắn muốn xóa giới hạn này? Vị trí sẽ không bị giới hạn số người trong ca này nữa.",
+      confirmLabel: "Xóa",
+      destructive: true,
+    });
+    if (!ok) return;
+
+    try {
+      await capacityApi.deleteCapacity(capacityTarget.id, capacityId);
+      toast.success("Đã xóa giới hạn số người");
+      await refetchCapacities();
     } catch (err) {
       toast.error(getErrorMessage(err));
     }
@@ -140,7 +215,7 @@ export default function ShiftsPage() {
             <TableHead>Giờ bắt đầu</TableHead>
             <TableHead>Giờ kết thúc</TableHead>
             <TableHead>Trạng thái</TableHead>
-            <TableHead className="w-64" />
+            <TableHead className="w-96" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -154,7 +229,10 @@ export default function ShiftsPage() {
                   {shift.isActive ? "Đang dùng" : "Đã ẩn"}
                 </Badge>
               </TableCell>
-              <TableCell className="flex gap-2">
+              <TableCell className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => openCapacities(shift)}>
+                  Giới hạn NS
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => openEdit(shift)}>
                   Sửa
                 </Button>
@@ -209,6 +287,115 @@ export default function ShiftsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={capacityTarget !== null} onOpenChange={(open) => !open && setCapacityTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Giới hạn nhân sự — {capacityTarget?.name}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Vị trí</TableHead>
+                  <TableHead>Tối đa</TableHead>
+                  <TableHead className="w-24" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {capacities.map((cap) => (
+                  <CapacityRow
+                    key={cap.id}
+                    positionLabel={`${cap.position.name} — ${cap.position.department.name}`}
+                    maxStaff={cap.maxStaff}
+                    onSave={(value) => handleUpdateCapacity(cap.id, value)}
+                    onDelete={() => handleDeleteCapacity(cap.id)}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+
+            {capacitiesLoading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+            {!capacitiesLoading && capacities.length === 0 && (
+              <p className="text-sm text-muted-foreground">Ca này chưa giới hạn số người cho vị trí nào.</p>
+            )}
+
+            <div className="space-y-2 border-t pt-4">
+              <Label>Thêm giới hạn mới</Label>
+              <div className="flex gap-2">
+                <Select value={newCapPositionId} onValueChange={(v) => setNewCapPositionId(v as string)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Chọn vị trí">
+                      {(value: string) => {
+                        const p = positions.find((x) => x.id === value);
+                        return p ? `${p.name} — ${p.department.name}` : "Chọn vị trí";
+                      }}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {positions.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name} — {p.department.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  type="number"
+                  min="1"
+                  className="w-24"
+                  placeholder="Tối đa"
+                  value={newCapMaxStaff}
+                  onChange={(e) => setNewCapMaxStaff(e.target.value)}
+                />
+                <Button onClick={handleCreateCapacity}>Thêm</Button>
+              </div>
+              {capacityError && <p className="text-sm text-destructive">{capacityError}</p>}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function CapacityRow({
+  positionLabel,
+  maxStaff,
+  onSave,
+  onDelete,
+}: {
+  positionLabel: string;
+  maxStaff: number;
+  onSave: (value: number) => void;
+  onDelete: () => void;
+}) {
+  const [value, setValue] = useState(String(maxStaff));
+  const dirty = Number(value) !== maxStaff && value !== "" && Number.isInteger(Number(value)) && Number(value) > 0;
+
+  return (
+    <TableRow>
+      <TableCell>{positionLabel}</TableCell>
+      <TableCell>
+        <Input
+          type="number"
+          min="1"
+          className="w-20"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </TableCell>
+      <TableCell className="flex gap-2">
+        {dirty && (
+          <Button size="sm" variant="outline" onClick={() => onSave(Number(value))}>
+            Lưu
+          </Button>
+        )}
+        <Button size="sm" variant="destructive" onClick={onDelete}>
+          Xóa
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }

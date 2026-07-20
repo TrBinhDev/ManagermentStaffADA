@@ -56,6 +56,13 @@ export const Message = {
       "Không thể xóa vì ca này đã có trong lịch làm việc, dùng Ẩn thay vì xóa",
   },
 
+  SHIFT_POSITION_CAPACITY: {
+    SHIFT_NOT_FOUND: "Ca làm việc không tồn tại",
+    POSITION_NOT_FOUND: "Vị trí không tồn tại",
+    PAIR_EXISTS: "Vị trí này đã có giới hạn số người cho ca này",
+    NOT_FOUND: "Không tìm thấy giới hạn số người này",
+  },
+
   MANAGER_ACCOUNT: {
     NOT_FOUND: "Không tìm thấy tài khoản",
     EMAIL_EXISTS: "Email đã được sử dụng",
