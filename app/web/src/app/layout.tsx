@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ManagementStaffADA",
-  description: "Quản lý nhân viên nhà hàng",
+  title: "ADA",
+  description: "Quản lý nhân viên",
 };
 
 export default function RootLayout({
