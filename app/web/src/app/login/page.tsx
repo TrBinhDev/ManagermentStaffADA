@@ -37,9 +37,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 rounded-lg border p-6">
-        <h1 className="text-lg font-semibold">Đăng nhập</h1>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-[oklch(0.96_0.025_268)] via-background to-[oklch(0.96_0.03_55)] dark:from-[oklch(0.15_0.03_270)] dark:via-background dark:to-[oklch(0.16_0.03_260)]">
+      <div className="animate-float-a pointer-events-none absolute -top-32 -left-24 h-80 w-80 rounded-full bg-indigo-400/30 blur-3xl dark:bg-indigo-500/20" />
+      <div className="animate-float-b pointer-events-none absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl dark:bg-fuchsia-500/15" />
+      <div className="animate-float-c pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-amber-300/25 blur-3xl dark:bg-amber-500/15" />
+
+      <form
+        onSubmit={handleSubmit}
+        className="animate-in fade-in slide-in-from-bottom-4 duration-500 relative z-10 w-full max-w-sm space-y-4 rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg shadow-primary/10 backdrop-blur-xl"
+      >
+        <h1 className="bg-linear-to-r from-primary to-accent bg-clip-text text-lg font-semibold text-transparent">
+          Đăng nhập
+        </h1>
 
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>

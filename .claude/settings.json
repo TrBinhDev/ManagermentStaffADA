@@ -85,7 +85,10 @@
       "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/attendance)",
       "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/payments)",
       "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/employees)",
-      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/positions)"
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/positions)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application/**)",
+      "Bash(curl -s -o /dev/null -w \"login=%{http_code}\\\\n\" http://localhost:8080/login)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

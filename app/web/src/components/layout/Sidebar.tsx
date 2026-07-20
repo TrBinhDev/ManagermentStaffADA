@@ -35,9 +35,9 @@ export function Sidebar() {
   const logout = useAuthStore((s) => s.logout);
 
   return (
-    <aside className="relative z-10 flex w-60 flex-col gap-1 border-r border-white/60 bg-white/70 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/60">
+    <aside className="relative z-10 flex w-60 flex-col gap-1 border-r border-sidebar-border bg-sidebar/80 p-4 backdrop-blur-xl">
       <div className="mb-4 flex items-center gap-2 px-2 py-1">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div className="flex size-8 items-center justify-center rounded-lg bg-linear-to-br from-primary to-accent text-primary-foreground shadow-sm shadow-primary/30">
           <UtensilsCrossed className="size-4" />
         </div>
         <span className="text-sm font-semibold tracking-tight">ManagementStaffADA</span>
@@ -51,13 +51,13 @@ export function Sidebar() {
             key={item.href}
             href={item.href}
             className={cn(
-              "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-all duration-200 hover:bg-muted hover:text-foreground",
-              active && "bg-muted font-medium text-foreground",
+              "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+              active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
             )}
           >
             <span
               className={cn(
-                "absolute top-1/2 left-0 h-0 w-0.5 -translate-y-1/2 rounded-full bg-primary transition-all duration-200",
+                "absolute top-1/2 left-0 h-0 w-0.5 -translate-y-1/2 rounded-full bg-linear-to-b from-primary to-accent transition-all duration-200",
                 active && "h-5",
               )}
             />

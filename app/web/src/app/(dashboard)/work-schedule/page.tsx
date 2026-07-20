@@ -86,7 +86,7 @@ export default function WorkSchedulePage() {
             value={shiftId ?? ALL_SHIFTS}
             onValueChange={(v) => setShiftId(v === ALL_SHIFTS ? null : (v as string))}
           >
-            <SelectTrigger className="w-48">
+            <SelectTrigger className="h-8 w-48">
               <SelectValue>
                 {(value: string) =>
                   value === ALL_SHIFTS ? "Tất cả ca" : (shifts.find((s) => s.id === value)?.name ?? "Tất cả ca")
