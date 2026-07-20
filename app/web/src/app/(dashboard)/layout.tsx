@@ -34,10 +34,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <Sidebar />
 
-      <main className="relative z-10 flex-1 p-6">
+      <main className="relative z-10 min-w-0 flex-1 p-6">
         <div
           key={pathname}
-          className="animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-lg shadow-slate-200/50 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/60 dark:shadow-black/20"
+          className="animate-in fade-in slide-in-from-bottom-2 duration-300 min-w-0 rounded-2xl border border-white/60 bg-white/70 p-6 shadow-lg shadow-slate-200/50 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/60 dark:shadow-black/20"
         >
           {children}
         </div>

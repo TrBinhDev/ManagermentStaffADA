@@ -327,7 +327,18 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
     fetchShifts({ isActive: true, limit: 100 });
   }, [fetchShifts]);
 
+  useEffect(() => {
+    // Doi thang/nam thi cac so ngay dang chon (theo thang cu) khong con y nghia nua.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset selection khi doi filter thang/nam
+    setSelectedDays(new Set());
+  }, [month, year]);
+
   const daysInMonth = new Date(year, month, 0).getDate();
+  const todayDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  function isPastDay(day: number) {
+    return new Date(year, month - 1, day) < todayDateOnly;
+  }
 
   function toggleDay(day: number) {
     setSelectedDays((prev) => {
@@ -480,21 +491,28 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
         </Select>
 
         <div className="flex flex-wrap gap-1.5">
-          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => (
-            <button
-              key={day}
-              type="button"
-              onClick={() => toggleDay(day)}
-              className={cn(
-                "flex size-9 items-center justify-center rounded-md border text-sm transition-colors",
-                selectedDays.has(day)
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border hover:bg-muted",
-              )}
-            >
-              {day}
-            </button>
-          ))}
+          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+            const past = isPastDay(day);
+            return (
+              <button
+                key={day}
+                type="button"
+                disabled={past}
+                onClick={() => toggleDay(day)}
+                title={past ? "Ngày đã qua, không thể xếp lịch" : undefined}
+                className={cn(
+                  "flex size-9 items-center justify-center rounded-md border text-sm transition-colors",
+                  past
+                    ? "cursor-not-allowed border-border/50 text-muted-foreground/40"
+                    : selectedDays.has(day)
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border hover:bg-muted",
+                )}
+              >
+                {day}
+              </button>
+            );
+          })}
         </div>
 
         {bulkError && <p className="text-sm text-destructive">{bulkError}</p>}
