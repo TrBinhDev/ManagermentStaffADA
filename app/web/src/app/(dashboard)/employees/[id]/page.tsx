@@ -9,6 +9,9 @@ import * as employeeProfileApi from "@/features/employee-profile/employee-profil
 import type { UpsertEmployeeProfileInput } from "@/features/employee-profile/employee-profile.types";
 import { usePositionHistory } from "@/features/position-history/use-position-history";
 import { useEmploymentPeriods } from "@/features/employment-period/use-employment-period";
+import * as workScheduleApi from "@/features/work-schedule/work-schedule.api";
+import type { EmployeeWorkScheduleItem } from "@/features/work-schedule/work-schedule.types";
+import { useShiftStore } from "@/features/shift/shift.store";
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
 import { getErrorMessage } from "@/lib/error";
@@ -17,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -24,6 +28,7 @@ const TABS = [
   { key: "profile", label: "Hồ sơ" },
   { key: "position-history", label: "Lịch sử vị trí" },
   { key: "employment-period", label: "Lịch sử gắn bó" },
+  { key: "work-schedule", label: "Lịch làm việc" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -55,6 +60,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       {tab === "profile" && <ProfileTab employeeId={id} />}
       {tab === "position-history" && <PositionHistoryTab employeeId={id} />}
       {tab === "employment-period" && <EmploymentPeriodTab employeeId={id} />}
+      {tab === "work-schedule" && <WorkScheduleTab employeeId={id} />}
     </div>
   );
 }
@@ -286,6 +292,216 @@ function PositionHistoryTab({ employeeId }: { employeeId: string }) {
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function WorkScheduleTab({ employeeId }: { employeeId: string }) {
+  const toast = useToast();
+  const confirm = useConfirm();
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const [schedule, setSchedule] = useState<EmployeeWorkScheduleItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const shifts = useShiftStore((s) => s.data);
+  const fetchShifts = useShiftStore((s) => s.fetchAll);
+
+  const [bulkShiftId, setBulkShiftId] = useState("");
+  const [selectedDays, setSelectedDays] = useState<Set<number>>(new Set());
+  const [bulkError, setBulkError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    const result = await workScheduleApi.fetchEmployeeWorkSchedule(employeeId, month, year);
+    setSchedule(result);
+    setLoading(false);
+  }, [employeeId, month, year]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount/thay-doi-thang, refetch tu setState ben trong
+    refetch();
+  }, [refetch]);
+
+  useEffect(() => {
+    fetchShifts({ isActive: true, limit: 100 });
+  }, [fetchShifts]);
+
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  function toggleDay(day: number) {
+    setSelectedDays((prev) => {
+      const next = new Set(prev);
+      if (next.has(day)) next.delete(day);
+      else next.add(day);
+      return next;
+    });
+  }
+
+  function formatDate(day: number) {
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  async function handleBulkCreate() {
+    if (!bulkShiftId || selectedDays.size === 0) {
+      setBulkError("Chọn ca và ít nhất 1 ngày");
+      return;
+    }
+    setBulkError(null);
+    try {
+      const workDates = Array.from(selectedDays)
+        .sort((a, b) => a - b)
+        .map(formatDate);
+      const result = await workScheduleApi.bulkCreateWorkSchedule(employeeId, { shiftId: bulkShiftId, workDates });
+      if (result.rejected.length > 0) {
+        toast.error(`Đã xếp ${result.created.length} ngày, ${result.rejected.length} ngày bị từ chối (đã đủ người)`);
+      } else {
+        toast.success(`Đã xếp ${result.created.length} ngày`);
+      }
+      setSelectedDays(new Set());
+      await refetch();
+    } catch (err) {
+      setBulkError(getErrorMessage(err));
+    }
+  }
+
+  async function handleChangeShift(scheduleId: string, shiftId: string) {
+    try {
+      await workScheduleApi.updateWorkSchedule(employeeId, scheduleId, { shiftId });
+      toast.success("Đã đổi ca");
+      await refetch();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  async function handleDelete(scheduleId: string) {
+    const ok = await confirm({
+      title: "Gỡ lịch làm việc",
+      description: "Bạn có chắc chắn muốn gỡ ngày làm việc này không?",
+      confirmLabel: "Gỡ",
+      destructive: true,
+    });
+    if (!ok) return;
+
+    try {
+      await workScheduleApi.deleteWorkSchedule(employeeId, scheduleId);
+      toast.success("Đã gỡ lịch làm việc");
+      await refetch();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Tháng</p>
+          <Input
+            type="number"
+            min="1"
+            max="12"
+            className="w-20"
+            value={month}
+            onChange={(e) => setMonth(Number(e.target.value))}
+          />
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Năm</p>
+          <Input
+            type="number"
+            className="w-24"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+          />
+        </div>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Ngày</TableHead>
+            <TableHead>Ca</TableHead>
+            <TableHead className="w-72" />
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {schedule.map((row) => (
+            <TableRow key={row.id}>
+              <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
+              <TableCell>
+                {row.shift.name} ({row.shift.startTime}–{row.shift.endTime})
+              </TableCell>
+              <TableCell className="flex gap-2">
+                <Select value={row.shiftId} onValueChange={(v) => handleChangeShift(row.id, v as string)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue>
+                      {(value: string) => shifts.find((s) => s.id === value)?.name ?? "Đổi ca"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shifts.map((s) => (
+                      <SelectItem key={s.id} value={s.id}>
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(row.id)}>
+                  Gỡ
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+      {!loading && schedule.length === 0 && (
+        <p className="text-sm text-muted-foreground">Chưa có lịch làm việc tháng này.</p>
+      )}
+
+      <div className="space-y-3 rounded-lg border p-4">
+        <Label>Xếp lịch mới</Label>
+        <Select value={bulkShiftId} onValueChange={(v) => setBulkShiftId(v as string)}>
+          <SelectTrigger className="w-48">
+            <SelectValue placeholder="Chọn ca">
+              {(value: string) => shifts.find((s) => s.id === value)?.name ?? "Chọn ca"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {shifts.map((s) => (
+              <SelectItem key={s.id} value={s.id}>
+                {s.name} ({s.startTime}–{s.endTime})
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="flex flex-wrap gap-1.5">
+          {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => (
+            <button
+              key={day}
+              type="button"
+              onClick={() => toggleDay(day)}
+              className={cn(
+                "flex size-9 items-center justify-center rounded-md border text-sm transition-colors",
+                selectedDays.has(day)
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border hover:bg-muted",
+              )}
+            >
+              {day}
+            </button>
+          ))}
+        </div>
+
+        {bulkError && <p className="text-sm text-destructive">{bulkError}</p>}
+
+        <Button onClick={handleBulkCreate}>Xếp lịch ({selectedDays.size} ngày)</Button>
+      </div>
+    </div>
   );
 }
 

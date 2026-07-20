@@ -63,6 +63,14 @@ export const Message = {
     NOT_FOUND: "Không tìm thấy giới hạn số người này",
   },
 
+  WORK_SCHEDULE: {
+    EMPLOYEE_NOT_FOUND: "Không tìm thấy nhân viên",
+    EMPLOYEE_RESIGNED: "Nhân viên đã nghỉ việc, không thể xếp lịch",
+    SHIFT_NOT_FOUND: "Ca làm việc không tồn tại",
+    NOT_FOUND: "Không tìm thấy lịch làm việc này",
+    SHIFT_FULL: "Ca này đã đủ số người cho vị trí này",
+  },
+
   MANAGER_ACCOUNT: {
     NOT_FOUND: "Không tìm thấy tài khoản",
     EMAIL_EXISTS: "Email đã được sử dụng",

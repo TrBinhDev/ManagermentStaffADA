@@ -3,6 +3,7 @@ export const ROUTES = {
   departments: "/departments",
   positions: "/positions",
   shifts: "/shifts",
+  workSchedule: "/work-schedule",
   employees: "/employees",
   managerAccounts: "/manager-accounts",
   settings: "/settings",
