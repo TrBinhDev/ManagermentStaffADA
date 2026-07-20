@@ -66,7 +66,9 @@
       "Read(//c/Users/Admin/.claude/projects/f--Project-ManagermentStaffADA/memory//**)",
       "Bash(curl -s -o /dev/null -w \"GET /positions -> %{http_code}\\\\n\" http://localhost:3000/positions)",
       "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-position-salary-rate.ps1 2>&1 | Select-Object -Last 100)",
-      "Bash(node -e \"console.log\\(new Date\\(\\).toString\\(\\)\\); console.log\\(Intl.DateTimeFormat\\(\\).resolvedOptions\\(\\).timeZone\\)\")"
+      "Bash(node -e \"console.log\\(new Date\\(\\).toString\\(\\)\\); console.log\\(Intl.DateTimeFormat\\(\\).resolvedOptions\\(\\).timeZone\\)\")",
+      "Bash(curl -s -o /dev/null -w \"backend http_code=%{http_code}\\\\n\" http://localhost:3000/positions)",
+      "Bash(curl -s -o /dev/null -w \"frontend http_code=%{http_code}\\\\n\" http://localhost:8080)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { usePositionStore } from "@/features/position/position.store";
 import { useDepartmentStore } from "@/features/department/department.store";
 import type { Position } from "@/features/position/position.types";
+import { useAuthStore } from "@/features/auth/auth.store";
+import { usePositionSalaryRates } from "@/features/position-salary-rate/use-position-salary-rate";
+import * as positionSalaryRateApi from "@/features/position-salary-rate/position-salary-rate.api";
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
 import { getErrorMessage } from "@/lib/error";
@@ -22,6 +25,7 @@ export default function PositionsPage() {
   const { data, loading, fetchAll, create, update, remove } = usePositionStore();
   const toast = useToast();
   const confirm = useConfirm();
+  const role = useAuthStore((s) => s.role);
   const departments = useDepartmentStore((s) => s.data);
   const fetchDepartments = useDepartmentStore((s) => s.fetchAll);
 
@@ -34,6 +38,15 @@ export default function PositionsPage() {
   const [editName, setEditName] = useState("");
   const [editDepartmentId, setEditDepartmentId] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
+
+  const [salaryTarget, setSalaryTarget] = useState<Position | null>(null);
+  const [newHourlyRate, setNewHourlyRate] = useState("");
+  const [salaryError, setSalaryError] = useState<string | null>(null);
+  const {
+    data: salaryRates,
+    loading: salaryLoading,
+    refetch: refetchSalaryRates,
+  } = usePositionSalaryRates(salaryTarget?.id ?? null);
 
   useEffect(() => {
     fetchDepartments({ limit: 100 });
@@ -81,6 +94,30 @@ export default function PositionsPage() {
       toast.success(pos.isActive ? "Đã ẩn vị trí" : "Đã hiện lại vị trí");
     } catch (err) {
       toast.error(getErrorMessage(err));
+    }
+  }
+
+  function openSalaryRates(pos: Position) {
+    setSalaryTarget(pos);
+    setNewHourlyRate("");
+    setSalaryError(null);
+  }
+
+  async function handleCreateSalaryRate() {
+    if (!salaryTarget) return;
+    const hourlyRate = Number(newHourlyRate);
+    if (!newHourlyRate || Number.isNaN(hourlyRate) || hourlyRate <= 0) {
+      setSalaryError("Mức lương phải lớn hơn 0");
+      return;
+    }
+    setSalaryError(null);
+    try {
+      await positionSalaryRateApi.createSalaryRate(salaryTarget.id, { hourlyRate });
+      toast.success("Đã đặt mức lương mới");
+      setNewHourlyRate("");
+      await refetchSalaryRates();
+    } catch (err) {
+      setSalaryError(getErrorMessage(err));
     }
   }
 
@@ -185,7 +222,7 @@ export default function PositionsPage() {
             <TableHead>Tên</TableHead>
             <TableHead>Phòng ban</TableHead>
             <TableHead>Trạng thái</TableHead>
-            <TableHead className="w-64" />
+            <TableHead className="w-80" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -198,7 +235,10 @@ export default function PositionsPage() {
                   {pos.isActive ? "Đang dùng" : "Đã ẩn"}
                 </Badge>
               </TableCell>
-              <TableCell className="flex gap-2">
+              <TableCell className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => openSalaryRates(pos)}>
+                  Lương
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => openEdit(pos)}>
                   Sửa
                 </Button>
@@ -250,6 +290,60 @@ export default function PositionsPage() {
           <DialogFooter>
             <Button onClick={handleSaveEdit}>Lưu</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={salaryTarget !== null} onOpenChange={(open) => !open && setSalaryTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Lương — {salaryTarget?.name}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Mức lương/giờ</TableHead>
+                  <TableHead>Từ ngày</TableHead>
+                  <TableHead>Đến ngày</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {salaryRates.map((rate) => (
+                  <TableRow key={rate.id}>
+                    <TableCell>{Number(rate.hourlyRate).toLocaleString("vi-VN")}đ</TableCell>
+                    <TableCell>{new Date(rate.effectiveFrom).toLocaleDateString("vi-VN")}</TableCell>
+                    <TableCell>
+                      {rate.effectiveTo ? new Date(rate.effectiveTo).toLocaleDateString("vi-VN") : "Đang áp dụng"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {salaryLoading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+            {!salaryLoading && salaryRates.length === 0 && (
+              <p className="text-sm text-muted-foreground">Vị trí này chưa có mức lương nào.</p>
+            )}
+
+            {role === "OWNER" && (
+              <div className="space-y-2 border-t pt-4">
+                <Label htmlFor="newHourlyRate">Đặt mức lương mới (đ/giờ)</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="newHourlyRate"
+                    type="number"
+                    min="0"
+                    value={newHourlyRate}
+                    onChange={(e) => setNewHourlyRate(e.target.value)}
+                    placeholder="VD: 25000"
+                  />
+                  <Button onClick={handleCreateSalaryRate}>Đặt mức mới</Button>
+                </div>
+                {salaryError && <p className="text-sm text-destructive">{salaryError}</p>}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
