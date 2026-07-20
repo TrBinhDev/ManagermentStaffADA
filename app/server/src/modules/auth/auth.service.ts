@@ -12,7 +12,7 @@ export async function login({ email, password }: LoginInput) {
   const account = await authRepository.findByEmail(email);
 
   if (!account || !account.isActive) {
-    throw new UnauthorizedError(Message.AUTH.INVALID_CREDENTIALS, 'INVALID_CREDENTIALS');
+    throw new UnauthorizedError(Message.AUTH.LOCKED_ACCOUNT, 'INVALID_CREDENTIALS');
   }
 
   const passwordMatches = await bcrypt.compare(password, account.passwordHash);

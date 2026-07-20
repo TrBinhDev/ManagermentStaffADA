@@ -9,6 +9,7 @@ export const Message = {
   AUTH: {
     INVALID_CREDENTIALS: "Email hoặc mật khẩu không đúng",
     INVALID_OLD_PASSWORD: "Mật khẩu cũ không đúng",
+    LOCKED_ACCOUNT: "Tài khoản đã bị khóa, vui lòng liên hệ quản trị viên",
     WEAK_PASSWORD: "Mật khẩu phải có ít nhất 8 ký tự, bao gồm cả chữ và số",
   },
 
