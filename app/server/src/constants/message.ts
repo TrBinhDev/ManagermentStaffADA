@@ -71,6 +71,24 @@ export const Message = {
     SHIFT_FULL: "Ca này đã đủ số người cho vị trí này",
   },
 
+  ATTENDANCE: {
+    EMPLOYEE_NOT_FOUND: "Không tìm thấy nhân viên",
+    EMPLOYEE_RESIGNED: "Nhân viên đã nghỉ việc, không thể chấm công",
+    SHIFT_NOT_FOUND: "Ca làm việc không tồn tại",
+    NO_WORK_SCHEDULE: "Nhân viên chưa được xếp ca này, không thể chấm công",
+    ALREADY_CHECKED_IN: "Đã chấm công vào cho ca này rồi",
+    NOT_FOUND: "Không tìm thấy bản ghi chấm công",
+    NOT_CHECKED_IN: "Chưa chấm công vào, không thể chấm công ra",
+    ALREADY_CHECKED_OUT: "Đã chấm công ra rồi",
+    NO_POSITION_HISTORY: "Không tìm thấy lịch sử vị trí phù hợp với ngày làm việc này",
+    NO_SALARY_RATE:
+      "Vị trí chưa có mức lương được thiết lập, không thể tính lương. Vui lòng đặt mức lương trước khi chấm công ra",
+  },
+
+  DAILY_PAYMENT: {
+    EMPLOYEE_NOT_FOUND: "Không tìm thấy nhân viên",
+  },
+
   MANAGER_ACCOUNT: {
     NOT_FOUND: "Không tìm thấy tài khoản",
     EMAIL_EXISTS: "Email đã được sử dụng",

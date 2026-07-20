@@ -41,6 +41,17 @@ async function main() {
     await prisma.positionSalaryRate.deleteMany({ where: { positionId: arg } });
     await prisma.position.delete({ where: { id: arg } });
     console.log('deleted');
+  } else if (cmd === 'force-delete-employee') {
+    // Employee co Attendance/DailyPayment bi chan xoa qua API (dung, bao ve du lieu tien
+    // luong that) — fixture nay xoa thang toan bo chuoi du lieu de don dep sau khi test.
+    await prisma.dailyPayment.deleteMany({ where: { employeeId: arg } });
+    await prisma.attendance.deleteMany({ where: { employeeId: arg } });
+    await prisma.workSchedule.deleteMany({ where: { employeeId: arg } });
+    await prisma.positionHistory.deleteMany({ where: { employeeId: arg } });
+    await prisma.employmentPeriod.deleteMany({ where: { employeeId: arg } });
+    await prisma.employeeProfile.deleteMany({ where: { employeeId: arg } });
+    await prisma.employee.delete({ where: { id: arg } });
+    console.log('deleted');
   } else {
     throw new Error(`Unknown command: ${cmd}`);
   }

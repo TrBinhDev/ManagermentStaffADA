@@ -12,6 +12,10 @@ import { useEmploymentPeriods } from "@/features/employment-period/use-employmen
 import * as workScheduleApi from "@/features/work-schedule/work-schedule.api";
 import type { EmployeeWorkScheduleItem } from "@/features/work-schedule/work-schedule.types";
 import { useShiftStore } from "@/features/shift/shift.store";
+import * as attendanceApi from "@/features/attendance/attendance.api";
+import type { AttendanceItem } from "@/features/attendance/attendance.types";
+import * as dailyPaymentApi from "@/features/daily-payment/daily-payment.api";
+import type { DailyPaymentItem } from "@/features/daily-payment/daily-payment.types";
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
 import { getErrorMessage } from "@/lib/error";
@@ -29,6 +33,8 @@ const TABS = [
   { key: "position-history", label: "Lịch sử vị trí" },
   { key: "employment-period", label: "Lịch sử gắn bó" },
   { key: "work-schedule", label: "Lịch làm việc" },
+  { key: "attendance", label: "Chấm công" },
+  { key: "payments", label: "Lương" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -61,6 +67,8 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
       {tab === "position-history" && <PositionHistoryTab employeeId={id} />}
       {tab === "employment-period" && <EmploymentPeriodTab employeeId={id} />}
       {tab === "work-schedule" && <WorkScheduleTab employeeId={id} />}
+      {tab === "attendance" && <AttendanceTab employeeId={id} />}
+      {tab === "payments" && <PaymentsTab employeeId={id} />}
     </div>
   );
 }
@@ -519,6 +527,214 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
 
         <Button onClick={handleBulkCreate}>Xếp lịch ({selectedDays.size} ngày)</Button>
       </div>
+    </div>
+  );
+}
+
+function AttendanceTab({ employeeId }: { employeeId: string }) {
+  const toast = useToast();
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const [scheduleRows, setScheduleRows] = useState<EmployeeWorkScheduleItem[]>([]);
+  const [attendanceRows, setAttendanceRows] = useState<AttendanceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    const from = `${year}-${String(month).padStart(2, "0")}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+    const [schedules, attendanceResult] = await Promise.all([
+      workScheduleApi.fetchEmployeeWorkSchedule(employeeId, month, year),
+      attendanceApi.fetchAttendance({ employeeId, from, to, limit: 100 }),
+    ]);
+    setScheduleRows(schedules);
+    setAttendanceRows(attendanceResult.data);
+    setLoading(false);
+  }, [employeeId, month, year]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount/thay-doi-thang, refetch tu setState ben trong
+    refetch();
+  }, [refetch]);
+
+  function findAttendance(shiftId: string, workDate: string) {
+    return attendanceRows.find((a) => a.shiftId === shiftId && a.workDate.slice(0, 10) === workDate.slice(0, 10));
+  }
+
+  async function handleCheckIn(shiftId: string, workDate: string) {
+    try {
+      await attendanceApi.checkIn({ employeeId, shiftId, workDate: workDate.slice(0, 10) });
+      toast.success("Đã chấm công vào");
+      await refetch();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  async function handleCheckOut(attendanceId: string) {
+    try {
+      await attendanceApi.checkOut(attendanceId);
+      toast.success("Đã chấm công ra, đã tính lương ngày này");
+      await refetch();
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Tháng</p>
+          <Input
+            type="number"
+            min="1"
+            max="12"
+            className="w-20"
+            value={month}
+            onChange={(e) => setMonth(Number(e.target.value))}
+          />
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Năm</p>
+          <Input type="number" className="w-24" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+        </div>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Ngày</TableHead>
+            <TableHead>Ca</TableHead>
+            <TableHead>Giờ vào</TableHead>
+            <TableHead>Giờ ra</TableHead>
+            <TableHead className="w-40" />
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {scheduleRows.map((row) => {
+            const attendance = findAttendance(row.shiftId, row.workDate);
+            return (
+              <TableRow key={row.id}>
+                <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
+                <TableCell>{row.shift.name}</TableCell>
+                <TableCell>
+                  {attendance?.checkedInAt ? new Date(attendance.checkedInAt).toLocaleTimeString("vi-VN") : "—"}
+                </TableCell>
+                <TableCell>
+                  {attendance?.checkedOutAt ? new Date(attendance.checkedOutAt).toLocaleTimeString("vi-VN") : "—"}
+                </TableCell>
+                <TableCell>
+                  {!attendance && (
+                    <Button size="sm" variant="outline" onClick={() => handleCheckIn(row.shiftId, row.workDate)}>
+                      Chấm công vào
+                    </Button>
+                  )}
+                  {attendance && !attendance.checkedOutAt && (
+                    <Button size="sm" variant="outline" onClick={() => handleCheckOut(attendance.id)}>
+                      Chấm công ra
+                    </Button>
+                  )}
+                  {attendance?.checkedOutAt && <Badge variant="secondary">Hoàn tất</Badge>}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+
+      {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+      {!loading && scheduleRows.length === 0 && (
+        <p className="text-sm text-muted-foreground">Chưa có lịch làm việc tháng này để chấm công.</p>
+      )}
+    </div>
+  );
+}
+
+function PaymentsTab({ employeeId }: { employeeId: string }) {
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth() + 1);
+  const [year, setYear] = useState(now.getFullYear());
+  const [rows, setRows] = useState<DailyPaymentItem[]>([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalHours, setTotalHours] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    const result = await dailyPaymentApi.fetchEmployeePayments(employeeId, month, year);
+    setRows(result.data);
+    setTotalAmount(result.totalAmount);
+    setTotalHours(result.totalHours);
+    setLoading(false);
+  }, [employeeId, month, year]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount/thay-doi-thang, refetch tu setState ben trong
+    refetch();
+  }, [refetch]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Tháng</p>
+          <Input
+            type="number"
+            min="1"
+            max="12"
+            className="w-20"
+            value={month}
+            onChange={(e) => setMonth(Number(e.target.value))}
+          />
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Năm</p>
+          <Input type="number" className="w-24" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+        </div>
+      </div>
+
+      <div className="flex gap-6 rounded-lg border p-4">
+        <div>
+          <p className="text-xs text-muted-foreground">Tổng giờ làm</p>
+          <p className="text-lg font-semibold">{totalHours.toLocaleString("vi-VN")}h</p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Tổng lương</p>
+          <p className="text-lg font-semibold">{totalAmount.toLocaleString("vi-VN")}đ</p>
+        </div>
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Ngày</TableHead>
+            <TableHead>Vị trí</TableHead>
+            <TableHead>Số giờ</TableHead>
+            <TableHead>Đơn giá/giờ</TableHead>
+            <TableHead>Thành tiền</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.id}>
+              <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
+              <TableCell>{row.position.name}</TableCell>
+              <TableCell>{row.hoursWorked}</TableCell>
+              <TableCell>{Number(row.hourlyRate).toLocaleString("vi-VN")}đ</TableCell>
+              <TableCell>{Number(row.amount).toLocaleString("vi-VN")}đ</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+      {!loading && rows.length === 0 && (
+        <p className="text-sm text-muted-foreground">Chưa có dữ liệu lương tháng này.</p>
+      )}
     </div>
   );
 }

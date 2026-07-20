@@ -78,7 +78,12 @@
       "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/work-schedule)",
       "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/work-schedule)",
       "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/positions)",
-      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/employees)"
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/employees)",
+      "Bash(node -e \"const {Prisma} = require\\('@prisma/client'\\); const d = new Prisma.Decimal\\('10.5'\\); console.log\\(d.toString\\(\\), d.constructor.name\\);\")",
+      "Bash(cat)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-attendance.ps1 2>&1 | Select-Object -Last 200)",
+      "Bash(curl -s -o /dev/null -w \"backend=%{http_code}\\\\n\" http://localhost:3000/attendance)",
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/payments)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

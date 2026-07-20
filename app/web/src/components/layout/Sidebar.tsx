@@ -12,6 +12,7 @@ import {
   UtensilsCrossed,
   Clock,
   CalendarDays,
+  Wallet,
 } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { ROUTES } from "@/constants/routes";
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { href: ROUTES.positions, label: "Vị trí", icon: Briefcase },
   { href: ROUTES.shifts, label: "Ca làm việc", icon: Clock },
   { href: ROUTES.workSchedule, label: "Lịch làm việc", icon: CalendarDays },
+  { href: ROUTES.payments, label: "Lương", icon: Wallet },
   { href: ROUTES.employees, label: "Nhân viên", icon: Users },
   { href: ROUTES.managerAccounts, label: "Tài khoản quản lý", icon: ShieldCheck, ownerOnly: true },
   { href: ROUTES.settings, label: "Cài đặt", icon: Settings },

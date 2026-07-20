@@ -16,6 +16,8 @@ import { positionSalaryRateRouter } from './modules/position-salary-rate/positio
 import { shiftRouter } from './modules/shift/shift.routes.js';
 import { shiftPositionCapacityRouter } from './modules/shift-position-capacity/shift-position-capacity.routes.js';
 import { workScheduleRouter, workScheduleSummaryRouter } from './modules/work-schedule/work-schedule.routes.js';
+import { attendanceRouter } from './modules/attendance/attendance.routes.js';
+import { dailyPaymentRouter, dailyPaymentSummaryRouter } from './modules/daily-payment/daily-payment.routes.js';
 
 export const app = express();
 
@@ -36,6 +38,9 @@ app.use('/shifts', shiftRouter);
 app.use('/shifts', shiftPositionCapacityRouter);
 app.use('/employees', workScheduleRouter);
 app.use('/work-schedule', workScheduleSummaryRouter);
+app.use('/attendance', attendanceRouter);
+app.use('/employees', dailyPaymentRouter);
+app.use('/payments', dailyPaymentSummaryRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
