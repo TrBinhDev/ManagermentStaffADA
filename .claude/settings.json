@@ -48,7 +48,8 @@
       "Bash(pnpm lint *)",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\(x.id, x.name, x.department.name\\)\\)}\\)\")",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\(x.id, x.code, x.fullName\\)\\)}\\)\")",
-      "Bash(curl -s -o /dev/null -w \"/manager-accounts -> %{http_code}\\\\n\" http://localhost:8080/manager-accounts)"
+      "Bash(curl -s -o /dev/null -w \"/manager-accounts -> %{http_code}\\\\n\" http://localhost:8080/manager-accounts)",
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"
