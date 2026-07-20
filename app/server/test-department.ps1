@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 
 $baseUrl = "http://localhost:3000"
 $ownerEmail = "owner@ada.local"
-$ownerPassword = "Owner@123"
+$ownerPassword = "binh2004"
 
 function Show-Step($title) {
     Write-Host ""

@@ -25,6 +25,8 @@ export const Message = {
     NAME_EXISTS: "Tên vị trí đã tồn tại",
     DEPARTMENT_NOT_FOUND: "Phòng ban không tồn tại",
     HAS_EMPLOYEES: "Không thể xóa vì vị trí này đã từng có nhân viên đảm nhiệm",
+    HAS_SALARY_RATE:
+      "Không thể xóa vì vị trí này đã từng có mức lương, dùng Ẩn thay vì xóa",
   },
 
   EMPLOYEE: {

@@ -53,7 +53,9 @@ export default function EmployeesPage() {
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPositions({ limit: 100 });
+    // isActive: true — chi hien vi tri dang dung de chon, vi tri da an van hien thi dung ten
+    // qua employee.position tra ve tu API (khong phu thuoc list nay), chi khong chon MOI duoc thoi.
+    fetchPositions({ limit: 100, isActive: true });
     fetchDepartments({ limit: 100 });
   }, [fetchPositions, fetchDepartments]);
 

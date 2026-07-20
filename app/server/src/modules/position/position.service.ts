@@ -3,11 +3,11 @@ import { BadRequestError, NotFoundError, ConflictError } from '../../errors/AppE
 import * as positionRepository from './position.repository.js';
 import type { ListPositionQuery, CreatePositionInput, UpdatePositionInput } from './position.schema.js';
 
-export async function list({ departmentId, search, page, limit }: ListPositionQuery) {
+export async function list({ departmentId, search, isActive, page, limit }: ListPositionQuery) {
   const skip = (page - 1) * limit;
   const [data, total] = await Promise.all([
-    positionRepository.findMany(departmentId, search, skip, limit),
-    positionRepository.count(departmentId, search),
+    positionRepository.findMany(departmentId, search, isActive, skip, limit),
+    positionRepository.count(departmentId, search, isActive),
   ]);
 
   return { data, total, page, limit };
@@ -35,7 +35,7 @@ export async function create({ name, departmentId }: CreatePositionInput) {
   return positionRepository.create(name, departmentId);
 }
 
-export async function update(id: string, { name, departmentId }: UpdatePositionInput) {
+export async function update(id: string, { name, departmentId, isActive }: UpdatePositionInput) {
   const position = await positionRepository.findById(id);
   if (!position) {
     throw new NotFoundError(Message.POSITION.NOT_FOUND, 'POSITION_NOT_FOUND');
@@ -58,7 +58,7 @@ export async function update(id: string, { name, departmentId }: UpdatePositionI
     }
   }
 
-  return positionRepository.update(id, { name, departmentId });
+  return positionRepository.update(id, { name, departmentId, isActive });
 }
 
 export async function remove(id: string): Promise<void> {
@@ -70,6 +70,11 @@ export async function remove(id: string): Promise<void> {
   const historyCount = await positionRepository.countPositionHistory(id);
   if (historyCount > 0) {
     throw new ConflictError(Message.POSITION.HAS_EMPLOYEES, 'POSITION_HAS_EMPLOYEES');
+  }
+
+  const salaryRateCount = await positionRepository.countSalaryRate(id);
+  if (salaryRateCount > 0) {
+    throw new ConflictError(Message.POSITION.HAS_SALARY_RATE, 'POSITION_HAS_SALARY_RATE');
   }
 
   await positionRepository.remove(id);

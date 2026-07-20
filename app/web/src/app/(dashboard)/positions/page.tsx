@@ -10,11 +10,13 @@ import { getErrorMessage } from "@/lib/error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ALL_DEPARTMENTS = "__all__";
+const ALL_STATUS = "__all_status__";
 
 export default function PositionsPage() {
   const { data, loading, fetchAll, create, update, remove } = usePositionStore();
@@ -26,6 +28,7 @@ export default function PositionsPage() {
   const [name, setName] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const [filterDepartmentId, setFilterDepartmentId] = useState<string | null>(null);
+  const [filterIsActive, setFilterIsActive] = useState<boolean | null>(null);
 
   const [editTarget, setEditTarget] = useState<Position | null>(null);
   const [editName, setEditName] = useState("");
@@ -37,8 +40,11 @@ export default function PositionsPage() {
   }, [fetchDepartments]);
 
   useEffect(() => {
-    fetchAll(filterDepartmentId ? { departmentId: filterDepartmentId } : {});
-  }, [fetchAll, filterDepartmentId]);
+    fetchAll({
+      departmentId: filterDepartmentId ?? undefined,
+      isActive: filterIsActive ?? undefined,
+    });
+  }, [fetchAll, filterDepartmentId, filterIsActive]);
 
   async function handleCreate() {
     if (!name.trim() || !departmentId) return;
@@ -69,6 +75,15 @@ export default function PositionsPage() {
     }
   }
 
+  async function handleToggleActive(pos: Position) {
+    try {
+      await update(pos.id, { isActive: !pos.isActive });
+      toast.success(pos.isActive ? "Đã ẩn vị trí" : "Đã hiện lại vị trí");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  }
+
   async function handleRemove(id: string, name: string) {
     const ok = await confirm({
       title: "Xóa vị trí",
@@ -90,30 +105,53 @@ export default function PositionsPage() {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Vị trí</h1>
 
-      <div className="space-y-1">
-        <p className="text-xs text-muted-foreground">Lọc theo phòng ban</p>
-        <Select
-          value={filterDepartmentId ?? ALL_DEPARTMENTS}
-          onValueChange={(v) => setFilterDepartmentId(v === ALL_DEPARTMENTS ? null : (v as string))}
-        >
-          <SelectTrigger className="w-48">
-            <SelectValue>
-              {(value: string) =>
-                value === ALL_DEPARTMENTS
-                  ? "Tất cả phòng ban"
-                  : (departments.find((d) => d.id === value)?.name ?? "Tất cả phòng ban")
-              }
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL_DEPARTMENTS}>Tất cả phòng ban</SelectItem>
-            {departments.map((d) => (
-              <SelectItem key={d.id} value={d.id}>
-                {d.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex flex-wrap gap-4">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Lọc theo phòng ban</p>
+          <Select
+            value={filterDepartmentId ?? ALL_DEPARTMENTS}
+            onValueChange={(v) => setFilterDepartmentId(v === ALL_DEPARTMENTS ? null : (v as string))}
+          >
+            <SelectTrigger className="w-48">
+              <SelectValue>
+                {(value: string) =>
+                  value === ALL_DEPARTMENTS
+                    ? "Tất cả phòng ban"
+                    : (departments.find((d) => d.id === value)?.name ?? "Tất cả phòng ban")
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_DEPARTMENTS}>Tất cả phòng ban</SelectItem>
+              {departments.map((d) => (
+                <SelectItem key={d.id} value={d.id}>
+                  {d.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Trạng thái</p>
+          <Select
+            value={filterIsActive === null ? ALL_STATUS : String(filterIsActive)}
+            onValueChange={(v) => setFilterIsActive(v === ALL_STATUS ? null : v === "true")}
+          >
+            <SelectTrigger className="w-40">
+              <SelectValue>
+                {(value: string) =>
+                  ({ [ALL_STATUS]: "Tất cả", true: "Đang dùng", false: "Đã ẩn" })[value] ?? value
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_STATUS}>Tất cả</SelectItem>
+              <SelectItem value="true">Đang dùng</SelectItem>
+              <SelectItem value="false">Đã ẩn</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="flex flex-wrap items-end gap-2 rounded-lg border p-3">
@@ -146,7 +184,8 @@ export default function PositionsPage() {
           <TableRow>
             <TableHead>Tên</TableHead>
             <TableHead>Phòng ban</TableHead>
-            <TableHead className="w-40" />
+            <TableHead>Trạng thái</TableHead>
+            <TableHead className="w-64" />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -154,9 +193,17 @@ export default function PositionsPage() {
             <TableRow key={pos.id}>
               <TableCell>{pos.name}</TableCell>
               <TableCell>{pos.department.name}</TableCell>
+              <TableCell>
+                <Badge variant={pos.isActive ? "default" : "secondary"}>
+                  {pos.isActive ? "Đang dùng" : "Đã ẩn"}
+                </Badge>
+              </TableCell>
               <TableCell className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => openEdit(pos)}>
                   Sửa
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => handleToggleActive(pos)}>
+                  {pos.isActive ? "Ẩn" : "Hiện"}
                 </Button>
                 <Button variant="destructive" size="sm" onClick={() => handleRemove(pos.id, pos.name)}>
                   Xóa

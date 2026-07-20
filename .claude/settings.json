@@ -49,7 +49,19 @@
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\(x.id, x.name, x.department.name\\)\\)}\\)\")",
       "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\);process.stdin.on\\('end',\\(\\)=>{JSON.parse\\(d\\).data.forEach\\(x=>console.log\\(x.id, x.code, x.fullName\\)\\)}\\)\")",
       "Bash(curl -s -o /dev/null -w \"/manager-accounts -> %{http_code}\\\\n\" http://localhost:8080/manager-accounts)",
-      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)"
+      "PowerShell(Get-Process node -ErrorAction SilentlyContinue)",
+      "Bash(pnpm dev *)",
+      "Bash(curl -s -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"owner@ada.local\",\"password\":\"Owner@123\"}')",
+      "Bash(docker exec *)",
+      "Bash(curl -s -X POST http://localhost:3000/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"email\\\\\":\\\\\"owner@ada.local\\\\\",\\\\\"password\\\\\":\\\\\"Owner@123\\\\\"}\")",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-auth.ps1 2>&1 | Select-Object -Last 60)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-department.ps1 2>&1 | Select-Object -Last 80)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-position.ps1 2>&1 | Select-Object -Last 100)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-employee.ps1 2>&1 | Select-Object -Last 120)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-employee-profile.ps1 2>&1 | Select-Object -Last 120)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-manager-account.ps1 2>&1 | Select-Object -Last 150)",
+      "PowerShell(cd F:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server; powershell -File test-position-history-employment-period.ps1 2>&1 | Select-Object -Last 150)",
+      "Bash(git status *)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"
