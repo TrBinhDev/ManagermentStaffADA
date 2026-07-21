@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { PaginationBar } from "@/components/ui/pagination-bar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
@@ -63,7 +62,7 @@ function ManagerAccountsContent() {
   const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
-    fetchAll({ page: requestedPage, limit: 8 });
+    fetchAll({ page: requestedPage, limit: 9 });
   }, [fetchAll, requestedPage]);
 
   useEffect(() => {
@@ -196,50 +195,47 @@ function ManagerAccountsContent() {
         </Dialog>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Vai trò</TableHead>
-            <TableHead>Nhân viên</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead className="w-72" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((acc) => (
-            <TableRow key={acc.id}>
-              <TableCell>{acc.email}</TableCell>
-              <TableCell>{acc.role}</TableCell>
-              <TableCell>{acc.employee?.fullName ?? "—"}</TableCell>
-              <TableCell>
-                <Badge variant={acc.isActive ? "default" : "secondary"}>
-                  {acc.isActive ? "Đang hoạt động" : "Đã khóa"}
-                </Badge>
-              </TableCell>
-              <TableCell className="flex flex-wrap gap-2">
-                {acc.role !== "OWNER" && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleSetActive(acc.id, !acc.isActive, acc.email)}
-                    >
-                      {acc.isActive ? "Khóa" : "Mở khóa"}
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setResetTarget(acc.id)}>
-                      Đặt lại mật khẩu
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleRemove(acc.id, acc.email)}>
-                      Xóa
-                    </Button>
-                  </>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {!loading && data.length === 0 && (
+        <p className="text-sm text-muted-foreground">Chưa có tài khoản quản lý nào.</p>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {data.map((acc) => (
+          <div
+            key={acc.id}
+            className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <p className="truncate font-semibold" title={acc.email}>
+                {acc.email}
+              </p>
+              <Badge variant={acc.isActive ? "default" : "secondary"} className="shrink-0">
+                {acc.isActive ? "Đang hoạt động" : "Đã khóa"}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {acc.role} · {acc.employee?.fullName ?? "Không gắn nhân viên"}
+            </p>
+            {acc.role !== "OWNER" && (
+              <div className="mt-auto flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSetActive(acc.id, !acc.isActive, acc.email)}
+                >
+                  {acc.isActive ? "Khóa" : "Mở khóa"}
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setResetTarget(acc.id)}>
+                  Đặt lại mật khẩu
+                </Button>
+                <Button variant="destructive" size="sm" onClick={() => handleRemove(acc.id, acc.email)}>
+                  Xóa
+                </Button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
 

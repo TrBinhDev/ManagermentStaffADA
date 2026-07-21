@@ -89,7 +89,18 @@
       "Read(//c/Program Files/Google/Chrome/Application/**)",
       "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application/**)",
       "Bash(curl -s -o /dev/null -w \"login=%{http_code}\\\\n\" http://localhost:8080/login)",
-      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/attendance)"
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/attendance)",
+      "Bash(curl -s http://localhost:8080/positions)",
+      "Bash(curl -s http://localhost:8080/positions -o /tmp/positions.html)",
+      "Bash(curl -s \"http://localhost:8080/_next/static/chunks/%5Broot-of-the-server%5D__1z_xse7._.css\" -o /tmp/app.css)",
+      "Bash(sed -n '805,815p' /tmp/app.css)",
+      "Bash(curl -s -o /dev/null -w \"frontend=%{http_code}\\\\n\" http://localhost:8080/departments)",
+      "Bash(curl -s -o /dev/null -w \"departments=%{http_code}\\\\n\" http://localhost:8080/departments)",
+      "Bash(curl -s -o /dev/null -w \"positions=%{http_code}\\\\n\" http://localhost:8080/positions)",
+      "Bash(curl -s -o /dev/null -w \"shifts=%{http_code}\\\\n\" http://localhost:8080/shifts)",
+      "Bash(curl -s -o /dev/null -w \"payments=%{http_code}\\\\n\" http://localhost:8080/payments)",
+      "Bash(curl -s -o /dev/null -w \"employees=%{http_code}\\\\n\" http://localhost:8080/employees)",
+      "Bash(curl -s -o /dev/null -w \"manager-accounts=%{http_code}\\\\n\" http://localhost:8080/manager-accounts)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

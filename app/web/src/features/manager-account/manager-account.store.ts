@@ -26,7 +26,7 @@ export const useManagerAccountStore = create<ManagerAccountState>((set, get) => 
   data: [],
   total: 0,
   page: 1,
-  limit: 8,
+  limit: 9,
   loading: false,
   error: null,
 

@@ -55,7 +55,7 @@ export default function ShiftsPage() {
   }, [filterIsActive]);
 
   useEffect(() => {
-    fetchAll({ isActive: filterIsActive ?? undefined, page: requestedPage, limit: 8 });
+    fetchAll({ isActive: filterIsActive ?? undefined, page: requestedPage, limit: 9 });
   }, [fetchAll, filterIsActive, requestedPage]);
 
   useEffect(() => {
@@ -180,7 +180,7 @@ export default function ShiftsPage() {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Ca làm việc</h1>
 
-      <div className="space-y-1">
+      <div className="space-y-1 rounded-xl border border-border/60 bg-card/60 p-3">
         <p className="text-xs text-muted-foreground">Trạng thái</p>
         <Select
           value={filterIsActive === null ? ALL_STATUS : String(filterIsActive)}
@@ -199,7 +199,7 @@ export default function ShiftsPage() {
         </Select>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-lg border p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Tên ca</p>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="VD: Ca sáng" />
@@ -215,45 +215,44 @@ export default function ShiftsPage() {
         <Button onClick={handleCreate}>Thêm</Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Tên ca</TableHead>
-            <TableHead>Giờ bắt đầu</TableHead>
-            <TableHead>Giờ kết thúc</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead className="w-96" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((shift) => (
-            <TableRow key={shift.id}>
-              <TableCell>{shift.name}</TableCell>
-              <TableCell>{shift.startTime}</TableCell>
-              <TableCell>{shift.endTime}</TableCell>
-              <TableCell>
-                <Badge variant={shift.isActive ? "default" : "secondary"}>
-                  {shift.isActive ? "Đang dùng" : "Đã ẩn"}
-                </Badge>
-              </TableCell>
-              <TableCell className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => openCapacities(shift)}>
-                  Giới hạn NS
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => openEdit(shift)}>
-                  Sửa
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => handleToggleActive(shift)}>
-                  {shift.isActive ? "Ẩn" : "Hiện"}
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleRemove(shift.id, shift.name)}>
-                  Xóa
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {!loading && data.length === 0 && (
+        <p className="text-sm text-muted-foreground">Chưa có ca làm việc nào.</p>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {data.map((shift) => (
+          <div
+            key={shift.id}
+            className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <p className="truncate text-base font-semibold" title={shift.name}>
+                {shift.name}
+              </p>
+              <Badge variant={shift.isActive ? "default" : "secondary"} className="shrink-0">
+                {shift.isActive ? "Đang dùng" : "Đã ẩn"}
+              </Badge>
+            </div>
+            <Badge variant="secondary" className="w-fit tabular-nums">
+              {shift.startTime}–{shift.endTime}
+            </Badge>
+            <div className="mt-auto flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => openCapacities(shift)}>
+                Giới hạn NS
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => openEdit(shift)}>
+                Sửa
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleToggleActive(shift)}>
+                {shift.isActive ? "Ẩn" : "Hiện"}
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleRemove(shift.id, shift.name)}>
+                Xóa
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
 

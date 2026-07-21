@@ -64,7 +64,7 @@ export default function PositionsPage() {
       departmentId: filterDepartmentId ?? undefined,
       isActive: filterIsActive ?? undefined,
       page: requestedPage,
-      limit: 8,
+      limit: 9,
     });
   }, [fetchAll, filterDepartmentId, filterIsActive, requestedPage]);
 
@@ -151,7 +151,7 @@ export default function PositionsPage() {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Vị trí</h1>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 rounded-xl border border-border/60 bg-card/60 p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Lọc theo phòng ban</p>
           <Select
@@ -200,7 +200,7 @@ export default function PositionsPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-lg border p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Tên vị trí</p>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Tên vị trí" />
@@ -225,43 +225,44 @@ export default function PositionsPage() {
         <Button onClick={handleCreate}>Thêm</Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Tên</TableHead>
-            <TableHead>Phòng ban</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead className="w-80" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((pos) => (
-            <TableRow key={pos.id}>
-              <TableCell>{pos.name}</TableCell>
-              <TableCell>{pos.department.name}</TableCell>
-              <TableCell>
-                <Badge variant={pos.isActive ? "default" : "secondary"}>
+      {!loading && data.length === 0 && <p className="text-sm text-muted-foreground">Chưa có vị trí nào.</p>}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {data.map((pos) => (
+          <div
+            key={pos.id}
+            className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-2">
+                <p className="truncate text-base font-semibold" title={pos.name}>
+                  {pos.name}
+                </p>
+                <Badge variant={pos.isActive ? "default" : "secondary"} className="shrink-0">
                   {pos.isActive ? "Đang dùng" : "Đã ẩn"}
                 </Badge>
-              </TableCell>
-              <TableCell className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => openSalaryRates(pos)}>
-                  Lương
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => openEdit(pos)}>
-                  Sửa
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => handleToggleActive(pos)}>
-                  {pos.isActive ? "Ẩn" : "Hiện"}
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleRemove(pos.id, pos.name)}>
-                  Xóa
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+              </div>
+              <p className="truncate text-sm text-muted-foreground" title={pos.department.name}>
+                {pos.department.name}
+              </p>
+            </div>
+            <div className="mt-auto flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={() => openSalaryRates(pos)}>
+                Lương
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => openEdit(pos)}>
+                Sửa
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleToggleActive(pos)}>
+                {pos.isActive ? "Ẩn" : "Hiện"}
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleRemove(pos.id, pos.name)}>
+                Xóa
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
 

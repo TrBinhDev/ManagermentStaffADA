@@ -40,7 +40,7 @@ export function Sidebar() {
   const logout = useAuthStore((s) => s.logout);
 
   return (
-    <aside className="relative z-10 flex w-60 flex-col gap-1 border-r border-sidebar-border bg-sidebar/80 p-4 backdrop-blur-xl">
+    <aside className="relative z-10 flex w-60 shrink-0 flex-col gap-1 border-r border-sidebar-border bg-sidebar/80 p-4 backdrop-blur-xl">
       <div className="mb-4 px-2 py-1">
         <h1 className="text-lg font-extrabold tracking-tight">
           <span className="text-foreground">Management</span>{" "}

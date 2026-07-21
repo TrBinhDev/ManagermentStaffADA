@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { useEmployeeStore } from "@/features/employee/employee.store";
 import { usePositionStore } from "@/features/position/position.store";
@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { PaginationBar } from "@/components/ui/pagination-bar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
@@ -29,6 +28,7 @@ import {
 const ALL_DEPARTMENTS = "__all__";
 
 export default function EmployeesPage() {
+  const router = useRouter();
   const { data, total, page, limit, loading, fetchAll, create, update, resign, rehire } = useEmployeeStore();
   const toast = useToast();
   const confirm = useConfirm();
@@ -72,7 +72,7 @@ export default function EmployeesPage() {
       departmentId: departmentId ?? undefined,
       search: search || undefined,
       page: requestedPage,
-      limit: 8,
+      limit: 9,
     });
   }, [fetchAll, status, departmentId, search, requestedPage]);
 
@@ -186,7 +186,7 @@ export default function EmployeesPage() {
         </Dialog>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-lg border p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Trạng thái</p>
           <Select value={status} onValueChange={(v) => setStatus(v as EmployeeStatus | "ALL")}>
@@ -237,51 +237,50 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Mã NV</TableHead>
-            <TableHead>Họ tên</TableHead>
-            <TableHead>Trạng thái</TableHead>
-            <TableHead className="w-56" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((emp) => (
-            <TableRow key={emp.id}>
-              <TableCell>
-                <Link href={`/employees/${emp.id}`} className="underline underline-offset-2">
-                  {emp.code}
-                </Link>
-              </TableCell>
-              <TableCell>{emp.fullName}</TableCell>
-              <TableCell>
-                <Badge variant={emp.status === "ACTIVE" ? "default" : "secondary"}>
-                  {emp.status === "ACTIVE" ? "Đang làm" : "Đã nghỉ"}
-                </Badge>
-              </TableCell>
-              <TableCell className="flex gap-2">
-                {emp.id !== currentEmployeeId && (
-                  <Button variant="outline" size="sm" onClick={() => openEdit(emp)}>
-                    Sửa
+      {!loading && data.length === 0 && <p className="text-sm text-muted-foreground">Chưa có nhân viên nào.</p>}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {data.map((emp) => (
+          <div
+            key={emp.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => router.push(`/employees/${emp.id}`)}
+            onKeyDown={(e) => e.key === "Enter" && router.push(`/employees/${emp.id}`)}
+            className="flex cursor-pointer flex-col gap-2 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <p className="truncate font-semibold text-primary" title={emp.code}>
+                {emp.code}
+              </p>
+              <Badge variant={emp.status === "ACTIVE" ? "default" : "secondary"} className="shrink-0">
+                {emp.status === "ACTIVE" ? "Đang làm" : "Đã nghỉ"}
+              </Badge>
+            </div>
+            <p className="truncate text-sm text-muted-foreground" title={emp.fullName}>
+              {emp.fullName}
+            </p>
+            <div className="mt-auto flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+              {emp.id !== currentEmployeeId && (
+                <Button variant="outline" size="sm" onClick={() => openEdit(emp)}>
+                  Sửa
+                </Button>
+              )}
+              {emp.status === "ACTIVE" ? (
+                emp.id !== currentEmployeeId && (
+                  <Button variant="outline" size="sm" onClick={() => handleResign(emp.id, emp.fullName)}>
+                    Cho nghỉ việc
                   </Button>
-                )}
-                {emp.status === "ACTIVE" ? (
-                  emp.id !== currentEmployeeId && (
-                    <Button variant="outline" size="sm" onClick={() => handleResign(emp.id, emp.fullName)}>
-                      Cho nghỉ việc
-                    </Button>
-                  )
-                ) : (
-                  <Button variant="outline" size="sm" onClick={() => handleRehire(emp.id)}>
-                    Thuê lại
-                  </Button>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                )
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => handleRehire(emp.id)}>
+                  Thuê lại
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
 

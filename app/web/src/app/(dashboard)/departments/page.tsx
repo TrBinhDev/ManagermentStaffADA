@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaginationBar } from "@/components/ui/pagination-bar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -31,7 +30,7 @@ export default function DepartmentsPage() {
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAll({ page: requestedPage, limit: 8 });
+    fetchAll({ page: requestedPage, limit: 9 });
   }, [fetchAll, requestedPage]);
 
   async function handleCreate() {
@@ -83,7 +82,7 @@ export default function DepartmentsPage() {
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Phòng ban</h1>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -93,29 +92,30 @@ export default function DepartmentsPage() {
         <Button onClick={handleCreate}>Thêm</Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Tên</TableHead>
-            <TableHead className="w-40" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((dept) => (
-            <TableRow key={dept.id}>
-              <TableCell>{dept.name}</TableCell>
-              <TableCell className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => openEdit(dept)}>
-                  Sửa
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => handleRemove(dept.id, dept.name)}>
-                  Xóa
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {!loading && data.length === 0 && (
+        <p className="text-sm text-muted-foreground">Chưa có phòng ban nào.</p>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {data.map((dept) => (
+          <div
+            key={dept.id}
+            className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+          >
+            <p className="truncate text-base font-semibold" title={dept.name}>
+              {dept.name}
+            </p>
+            <div className="mt-auto flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => openEdit(dept)}>
+                Sửa
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => handleRemove(dept.id, dept.name)}>
+                Xóa
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
 
