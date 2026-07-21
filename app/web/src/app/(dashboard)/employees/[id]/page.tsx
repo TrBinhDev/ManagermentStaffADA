@@ -361,6 +361,13 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
     return new Date(year, month - 1, day) < todayDateOnly;
   }
 
+  function isPastWorkDate(workDate: string) {
+    const d = new Date(workDate);
+    const workDateUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    return workDateUTC < todayUTC;
+  }
+
   function toggleDay(day: number) {
     setSelectedDays((prev) => {
       const next = new Set(prev);
@@ -459,33 +466,45 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {schedule.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
-              <TableCell>
-                {row.shift.name} ({row.shift.startTime}–{row.shift.endTime})
-              </TableCell>
-              <TableCell className="flex gap-2">
-                <Select value={row.shiftId} onValueChange={(v) => handleChangeShift(row.id, v as string)}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue>
-                      {(value: string) => shifts.find((s) => s.id === value)?.name ?? "Đổi ca"}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {shifts.map((s) => (
-                      <SelectItem key={s.id} value={s.id}>
-                        {s.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(row.id)}>
-                  Gỡ
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          {schedule.map((row) => {
+            const past = isPastWorkDate(row.workDate);
+            return (
+              <TableRow key={row.id} className={cn(past && "opacity-60")}>
+                <TableCell className="flex items-center gap-2">
+                  {new Date(row.workDate).toLocaleDateString("vi-VN")}
+                  {past && <Badge variant="secondary">Đã qua</Badge>}
+                </TableCell>
+                <TableCell>
+                  {row.shift.name} ({row.shift.startTime}–{row.shift.endTime})
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  {past ? (
+                    <span className="text-xs text-muted-foreground">Không thể sửa ngày đã qua</span>
+                  ) : (
+                    <>
+                      <Select value={row.shiftId} onValueChange={(v) => handleChangeShift(row.id, v as string)}>
+                        <SelectTrigger className="w-40">
+                          <SelectValue>
+                            {(value: string) => shifts.find((s) => s.id === value)?.name ?? "Đổi ca"}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          {shifts.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>
+                              {s.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="destructive" onClick={() => handleDelete(row.id)}>
+                        Gỡ
+                      </Button>
+                    </>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
 

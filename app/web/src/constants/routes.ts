@@ -4,6 +4,7 @@ export const ROUTES = {
   positions: "/positions",
   shifts: "/shifts",
   workSchedule: "/work-schedule",
+  attendance: "/attendance",
   payments: "/payments",
   employees: "/employees",
   managerAccounts: "/manager-accounts",

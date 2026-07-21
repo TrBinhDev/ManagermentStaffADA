@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   Settings,
   LogOut,
-  UtensilsCrossed,
   Clock,
   CalendarDays,
   Wallet,
@@ -23,6 +22,7 @@ const NAV_ITEMS = [
   { href: ROUTES.positions, label: "Vị trí", icon: Briefcase },
   { href: ROUTES.shifts, label: "Ca làm việc", icon: Clock },
   { href: ROUTES.workSchedule, label: "Lịch làm việc", icon: CalendarDays },
+  { href: ROUTES.attendance, label: "Chấm công", icon: Clock },
   { href: ROUTES.payments, label: "Lương", icon: Wallet },
   { href: ROUTES.employees, label: "Nhân viên", icon: Users },
   {

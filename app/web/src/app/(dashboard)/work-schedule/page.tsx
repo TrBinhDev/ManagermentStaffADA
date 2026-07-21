@@ -7,6 +7,7 @@ import { useShiftStore } from "@/features/shift/shift.store";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 const ALL_SHIFTS = "__all_shifts__";
 
@@ -40,6 +41,15 @@ export default function WorkSchedulePage() {
   }, [month, year, shiftId]);
 
   const daysInMonth = new Date(year, month, 0).getDate();
+  const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+  function isPastDay(day: number) {
+    return Date.UTC(year, month - 1, day) < todayUTC;
+  }
+
+  function isToday(day: number) {
+    return Date.UTC(year, month - 1, day) === todayUTC;
+  }
 
   const rows = useMemo(() => {
     const byEmployee = new Map<
@@ -114,9 +124,18 @@ export default function WorkSchedulePage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="sticky left-0 bg-background">Nhân viên</TableHead>
+              <TableHead className="sticky left-0 z-10 whitespace-nowrap bg-card font-bold text-primary">
+                Nhân viên
+              </TableHead>
               {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => (
-                <TableHead key={day} className="text-center">
+                <TableHead
+                  key={day}
+                  className={cn(
+                    "text-center",
+                    isPastDay(day) && "text-muted-foreground/50",
+                    isToday(day) && "border-b-2 border-primary font-semibold text-primary",
+                  )}
+                >
                   {day}
                 </TableHead>
               ))}
@@ -125,13 +144,20 @@ export default function WorkSchedulePage() {
           <TableBody>
             {rows.map(({ employee, days }) => (
               <TableRow key={employee.id}>
-                <TableCell className="sticky left-0 whitespace-nowrap bg-background">
+                <TableCell className="sticky left-0 z-10 whitespace-nowrap bg-card font-semibold text-foreground">
                   {employee.code} — {employee.fullName}
                 </TableCell>
                 {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
                   const items = days.get(day);
                   return (
-                    <TableCell key={day} className="text-center text-xs">
+                    <TableCell
+                      key={day}
+                      className={cn(
+                        "text-center text-xs",
+                        isPastDay(day) && "text-muted-foreground/50",
+                        isToday(day) && "bg-primary/5 font-medium",
+                      )}
+                    >
                       {items?.map((item) => item.shift.name).join(", ") ?? ""}
                     </TableCell>
                   );
