@@ -1,6 +1,7 @@
 import { Message } from '../../constants/message.js';
 import { BadRequestError, NotFoundError } from '../../errors/AppError.js';
 import { monthRangeUTC, parseDateOnly } from '../../utils/date.util.js';
+import { findExistingAttendance } from '../attendance/attendance.repository.js';
 import * as workScheduleRepository from './work-schedule.repository.js';
 import type {
   ListEmployeeWorkScheduleQuery,
@@ -106,6 +107,13 @@ export async function remove(scheduleId: string, employeeId: string): Promise<vo
   const schedule = await workScheduleRepository.findScheduleById(scheduleId);
   if (!schedule || schedule.employeeId !== employeeId) {
     throw new NotFoundError(Message.WORK_SCHEDULE.NOT_FOUND, 'WORK_SCHEDULE_NOT_FOUND');
+  }
+
+  // Da cham cong cho dung ca/ngay nay roi thi khong duoc go, tranh Attendance/DailyPayment
+  // con lai tro toi 1 ca lam da bi xoa khoi lich.
+  const attendance = await findExistingAttendance(schedule.employeeId, schedule.shiftId, schedule.workDate);
+  if (attendance) {
+    throw new BadRequestError(Message.WORK_SCHEDULE.HAS_ATTENDANCE, 'WORK_SCHEDULE_HAS_ATTENDANCE');
   }
 
   await workScheduleRepository.remove(scheduleId);

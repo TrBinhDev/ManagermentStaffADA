@@ -323,6 +323,7 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
   const [schedule, setSchedule] = useState<EmployeeWorkScheduleItem[]>([]);
+  const [attendedKeys, setAttendedKeys] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   const shifts = useShiftStore((s) => s.data);
@@ -334,8 +335,17 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
 
   const refetch = useCallback(async () => {
     setLoading(true);
-    const result = await workScheduleApi.fetchEmployeeWorkSchedule(employeeId, month, year);
+    const lastDay = new Date(year, month, 0).getDate();
+    const from = `${year}-${String(month).padStart(2, "0")}-01`;
+    const to = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+    const [result, attendance] = await Promise.all([
+      workScheduleApi.fetchEmployeeWorkSchedule(employeeId, month, year),
+      attendanceApi.fetchAttendance({ employeeId, from, to, limit: 100 }),
+    ]);
     setSchedule(result);
+    // Da co Attendance (tao ra ngay khi check-in) cho dung ca/ngay nay -> khoa sua/go, dong bo
+    // voi rang buoc server moi them o work-schedule.service.ts::remove().
+    setAttendedKeys(new Set(attendance.data.map((a) => `${a.shiftId}|${a.workDate.slice(0, 10)}`)));
     setLoading(false);
   }, [employeeId, month, year]);
 
@@ -468,18 +478,26 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
         <TableBody>
           {schedule.map((row) => {
             const past = isPastWorkDate(row.workDate);
+            const attended = attendedKeys.has(`${row.shiftId}|${row.workDate.slice(0, 10)}`);
+            const locked = past || attended;
             return (
-              <TableRow key={row.id} className={cn(past && "opacity-60")}>
+              <TableRow key={row.id} className={cn(locked && "opacity-60")}>
                 <TableCell className="flex items-center gap-2">
                   {new Date(row.workDate).toLocaleDateString("vi-VN")}
-                  {past && <Badge variant="secondary">Đã qua</Badge>}
+                  {attended ? (
+                    <Badge variant="secondary">Đã chấm công</Badge>
+                  ) : (
+                    past && <Badge variant="secondary">Đã qua</Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   {row.shift.name} ({row.shift.startTime}–{row.shift.endTime})
                 </TableCell>
                 <TableCell className="flex gap-2">
-                  {past ? (
-                    <span className="text-xs text-muted-foreground">Không thể sửa ngày đã qua</span>
+                  {locked ? (
+                    <span className="text-xs text-muted-foreground">
+                      {attended ? "Đã chấm công, không thể sửa/gỡ" : "Không thể sửa ngày đã qua"}
+                    </span>
                   ) : (
                     <>
                       <Select value={row.shiftId} onValueChange={(v) => handleChangeShift(row.id, v as string)}>

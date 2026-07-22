@@ -103,7 +103,10 @@
       "Bash(curl -s -o /dev/null -w \"manager-accounts=%{http_code}\\\\n\" http://localhost:8080/manager-accounts)",
       "Skill(dataviz)",
       "Skill(dataviz:*)",
-      "Bash(curl -s -o /dev/null -w \"overview=%{http_code}\\\\n\" http://localhost:8080/overview)"
+      "Bash(curl -s -o /dev/null -w \"overview=%{http_code}\\\\n\" http://localhost:8080/overview)",
+      "Bash(command -v k6)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/auth/login --max-time 3)",
+      "PowerShell(cd \"f:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File run-load-test-attendance.ps1)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

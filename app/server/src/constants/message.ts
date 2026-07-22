@@ -69,6 +69,7 @@ export const Message = {
     SHIFT_NOT_FOUND: "Ca làm việc không tồn tại",
     NOT_FOUND: "Không tìm thấy lịch làm việc này",
     SHIFT_FULL: "Ca này đã đủ số người cho vị trí này",
+    HAS_ATTENDANCE: "Không thể gỡ vì nhân viên đã chấm công cho ca này",
   },
 
   ATTENDANCE: {
