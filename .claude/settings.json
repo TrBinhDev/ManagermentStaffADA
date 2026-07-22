@@ -100,7 +100,10 @@
       "Bash(curl -s -o /dev/null -w \"shifts=%{http_code}\\\\n\" http://localhost:8080/shifts)",
       "Bash(curl -s -o /dev/null -w \"payments=%{http_code}\\\\n\" http://localhost:8080/payments)",
       "Bash(curl -s -o /dev/null -w \"employees=%{http_code}\\\\n\" http://localhost:8080/employees)",
-      "Bash(curl -s -o /dev/null -w \"manager-accounts=%{http_code}\\\\n\" http://localhost:8080/manager-accounts)"
+      "Bash(curl -s -o /dev/null -w \"manager-accounts=%{http_code}\\\\n\" http://localhost:8080/manager-accounts)",
+      "Skill(dataviz)",
+      "Skill(dataviz:*)",
+      "Bash(curl -s -o /dev/null -w \"overview=%{http_code}\\\\n\" http://localhost:8080/overview)"
     ],
     "additionalDirectories": [
       "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  LayoutDashboard,
   Building2,
   Briefcase,
   Users,
@@ -18,6 +19,7 @@ import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
+  { href: ROUTES.overview, label: "Tổng quan", icon: LayoutDashboard },
   { href: ROUTES.departments, label: "Phòng ban", icon: Building2 },
   { href: ROUTES.positions, label: "Vị trí", icon: Briefcase },
   { href: ROUTES.shifts, label: "Ca làm việc", icon: Clock },
