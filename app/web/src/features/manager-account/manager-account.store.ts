@@ -4,6 +4,7 @@ import type {
   ManagerAccount,
   ListManagerAccountParams,
   CreateManagerAccountInput,
+  UpdateManagerAccountInput,
   ResetPasswordInput,
 } from "./manager-account.types";
 
@@ -17,6 +18,7 @@ interface ManagerAccountState {
 
   fetchAll: (params?: ListManagerAccountParams) => Promise<void>;
   create: (input: CreateManagerAccountInput) => Promise<void>;
+  update: (id: string, input: UpdateManagerAccountInput) => Promise<void>;
   setActive: (id: string, isActive: boolean) => Promise<void>;
   resetPassword: (id: string, input: ResetPasswordInput) => Promise<void>;
   remove: (id: string) => Promise<void>;
@@ -42,6 +44,11 @@ export const useManagerAccountStore = create<ManagerAccountState>((set, get) => 
 
   create: async (input) => {
     await managerAccountApi.createManagerAccount(input);
+    await get().fetchAll({ page: get().page, limit: get().limit });
+  },
+
+  update: async (id, input) => {
+    await managerAccountApi.updateManagerAccount(id, input);
     await get().fetchAll({ page: get().page, limit: get().limit });
   },
 

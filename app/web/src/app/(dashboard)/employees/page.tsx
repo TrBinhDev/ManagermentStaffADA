@@ -6,6 +6,8 @@ import { useAuthStore } from "@/features/auth/auth.store";
 import { useEmployeeStore } from "@/features/employee/employee.store";
 import { usePositionStore } from "@/features/position/position.store";
 import { useDepartmentStore } from "@/features/department/department.store";
+import * as employeeApi from "@/features/employee/employee.api";
+import * as managerAccountApi from "@/features/manager-account/manager-account.api";
 import type { Employee, EmployeeStatus } from "@/features/employee/employee.types";
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
@@ -47,6 +49,9 @@ export default function EmployeesPage() {
   const [cccd, setCccd] = useState("");
   const [fullName, setFullName] = useState("");
   const [positionId, setPositionId] = useState("");
+  const [createAccount, setCreateAccount] = useState(false);
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
 
   const [editTarget, setEditTarget] = useState<Employee | null>(null);
@@ -79,12 +84,38 @@ export default function EmployeesPage() {
   async function handleCreate() {
     setFormError(null);
     if (!cccd.trim() || !fullName.trim() || !positionId) return;
+    if (createAccount && (!accountEmail.trim() || !accountPassword.trim())) {
+      setFormError("Nhập đầy đủ email và mật khẩu để tạo tài khoản đăng nhập");
+      return;
+    }
     try {
-      await create({ cccd: cccd.trim(), fullName: fullName.trim(), positionId });
-      toast.success("Đã thêm nhân viên");
+      if (createAccount) {
+        // Tao Employee truoc de lay id, roi tao ManagerAccount role STAFF gan voi id do luon -
+        // gop 2 buoc thanh 1 luong duy nhat thay vi phai qua trang Tai khoan quan ly rieng sau.
+        const emp = await employeeApi.createEmployee({ cccd: cccd.trim(), fullName: fullName.trim(), positionId });
+        await managerAccountApi.createManagerAccount({
+          email: accountEmail.trim(),
+          password: accountPassword,
+          role: "STAFF",
+          employeeId: emp.id,
+        });
+        await fetchAll({
+          status: status === "ALL" ? undefined : status,
+          departmentId: departmentId ?? undefined,
+          search: search || undefined,
+          page: requestedPage,
+          limit: 9,
+        });
+      } else {
+        await create({ cccd: cccd.trim(), fullName: fullName.trim(), positionId });
+      }
+      toast.success(createAccount ? "Đã thêm nhân viên và tài khoản đăng nhập" : "Đã thêm nhân viên");
       setCccd("");
       setFullName("");
       setPositionId("");
+      setCreateAccount(false);
+      setAccountEmail("");
+      setAccountPassword("");
       setOpen(false);
     } catch (err) {
       setFormError(getErrorMessage(err));
@@ -176,6 +207,40 @@ export default function EmployeesPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={createAccount}
+                  onChange={(e) => setCreateAccount(e.target.checked)}
+                  className="size-4 rounded border-input"
+                />
+                Tạo tài khoản đăng nhập luôn (nhân viên tự xem lương/lịch làm)
+              </label>
+
+              {createAccount && (
+                <div className="space-y-3 rounded-lg border border-border/60 p-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="accountEmail">Email đăng nhập</Label>
+                    <Input
+                      id="accountEmail"
+                      type="email"
+                      value={accountEmail}
+                      onChange={(e) => setAccountEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="accountPassword">Mật khẩu ban đầu</Label>
+                    <Input
+                      id="accountPassword"
+                      type="password"
+                      value={accountPassword}
+                      onChange={(e) => setAccountPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+
               {formError && <p className="text-sm text-destructive">{formError}</p>}
             </div>
 

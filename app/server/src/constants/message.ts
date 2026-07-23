@@ -98,5 +98,6 @@ export const Message = {
     EMPLOYEE_RESIGNED: "Không thể tạo tài khoản cho nhân viên đã nghỉ việc",
     EMPLOYEE_HAS_ACCOUNT: "Nhân viên này đã có tài khoản quản lý khác",
     CANNOT_MODIFY_OWNER: "Không thể chỉnh sửa tài khoản OWNER",
+    STAFF_REQUIRES_EMPLOYEE: "Tài khoản STAFF bắt buộc phải gắn với 1 nhân viên",
   },
 } as const;

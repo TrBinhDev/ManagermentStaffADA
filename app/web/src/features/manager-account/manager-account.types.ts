@@ -19,13 +19,15 @@ export interface ListManagerAccountParams {
 export interface CreateManagerAccountInput {
   email: string;
   password: string;
-  role: "MANAGER";
+  role: "MANAGER" | "STAFF";
   employeeId?: string;
 }
 
 export interface UpdateManagerAccountInput {
   isActive?: boolean;
   email?: string;
+  role?: "MANAGER" | "STAFF";
+  employeeId?: string | null;
 }
 
 export interface ResetPasswordInput {

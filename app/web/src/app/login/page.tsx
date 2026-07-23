@@ -25,7 +25,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.replace(ROUTES.departments);
+      // STAFF khong co quyen vao dashboard admin - dua thang vao khu vuc rieng cua ho.
+      const role = useAuthStore.getState().role;
+      router.replace(role === "STAFF" ? ROUTES.myWorkSchedule : ROUTES.departments);
     } catch (err) {
       const message = isAxiosError<ApiErrorBody>(err)
         ? (err.response?.data?.error?.message ?? "Đăng nhập thất bại")

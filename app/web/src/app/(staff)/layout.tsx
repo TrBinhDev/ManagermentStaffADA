@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/features/auth/auth.store";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { StaffSidebar } from "@/components/layout/StaffSidebar";
 import { ROUTES } from "@/constants/routes";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function StaffLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const isBootstrapping = useAuthStore((s) => s.isBootstrapping);
@@ -17,9 +17,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (isBootstrapping) return;
     if (!isAuthenticated) {
       router.replace(ROUTES.login);
-    } else if (role === "STAFF") {
-      // Khu vuc dashboard admin nay khong danh cho STAFF - dua ve khu vuc rieng cua ho.
-      router.replace(ROUTES.myWorkSchedule);
+    } else if (role !== "STAFF") {
+      // Khu vuc nay chi danh cho STAFF - OWNER/MANAGER vao nham thi dua ve dashboard admin.
+      router.replace(ROUTES.departments);
     }
   }, [isBootstrapping, isAuthenticated, role, router]);
 
@@ -27,7 +27,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Đang tải...</div>;
   }
 
-  if (!isAuthenticated || role === "STAFF") {
+  if (!isAuthenticated || role !== "STAFF") {
     return null;
   }
 
@@ -37,7 +37,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="animate-float-b pointer-events-none absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl dark:bg-fuchsia-500/15" />
       <div className="animate-float-c pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-amber-300/25 blur-3xl dark:bg-amber-500/15" />
 
-      <Sidebar />
+      <StaffSidebar />
 
       <main className="relative z-10 min-h-0 min-w-0 flex-1 overflow-y-auto p-6">
         <div

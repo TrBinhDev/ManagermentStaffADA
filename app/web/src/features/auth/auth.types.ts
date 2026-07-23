@@ -1,4 +1,4 @@
-export type ManagerRole = "OWNER" | "MANAGER";
+export type ManagerRole = "OWNER" | "MANAGER" | "STAFF";
 
 export interface LoginInput {
   email: string;

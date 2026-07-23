@@ -1,0 +1,35 @@
+import { z } from 'zod';
+
+const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+// Giong listAttendanceQuerySchema goc nhung BO han field employeeId - STAFF khong duoc tu
+// truyen employeeId, luon lay tu token (xem me.controller.ts).
+export const meAttendanceQuerySchema = z.object({
+  from: z.string().regex(DATE_ONLY_REGEX, 'Ngày không hợp lệ (định dạng YYYY-MM-DD)').optional(),
+  to: z.string().regex(DATE_ONLY_REGEX, 'Ngày không hợp lệ (định dạng YYYY-MM-DD)').optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+});
+export type MeAttendanceQuery = z.infer<typeof meAttendanceQuerySchema>;
+
+// Subset cua upsertEmployeeProfileSchema - BO cccd/cccdIssueDate/cccdIssuePlace (thong tin
+// dinh danh phap ly, phai qua admin xac nhan) va note (ghi chu noi bo HR, khong cho nhan
+// vien tu xem/sua).
+export const meUpdateProfileSchema = z.object({
+  gender: z.string().trim().optional(),
+  ethnicity: z.string().trim().optional(),
+  religion: z.string().trim().optional(),
+  permanentAddress: z.string().trim().optional(),
+  currentAddress: z.string().trim().optional(),
+  primaryPhone: z.string().trim().optional(),
+  email: z.string().email('Email không hợp lệ').optional(),
+  emergencyContactName: z.string().trim().optional(),
+  emergencyContactPhone: z.string().trim().optional(),
+  emergencyContactRelation: z.string().trim().optional(),
+  maritalStatus: z.string().trim().optional(),
+  educationLevel: z.string().trim().optional(),
+  bankName: z.string().trim().optional(),
+  bankAccountNumber: z.string().trim().optional(),
+  bankAccountHolder: z.string().trim().optional(),
+});
+export type MeUpdateProfileInput = z.infer<typeof meUpdateProfileSchema>;

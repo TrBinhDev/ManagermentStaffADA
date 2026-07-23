@@ -50,14 +50,17 @@ export function findEmployeeById(employeeId: string) {
   return prisma.employee.findUnique({ where: { id: employeeId } });
 }
 
-export function create(data: { email: string; passwordHash: string; employeeId?: string }) {
+export function create(data: { email: string; passwordHash: string; role: ManagerRole; employeeId?: string }) {
   return prisma.managerAccount.create({
-    data: { email: data.email, passwordHash: data.passwordHash, role: 'MANAGER', employeeId: data.employeeId },
+    data: { email: data.email, passwordHash: data.passwordHash, role: data.role, employeeId: data.employeeId },
     select: accountSelect,
   });
 }
 
-export function update(id: string, data: { isActive?: boolean; email?: string }) {
+export function update(
+  id: string,
+  data: { isActive?: boolean; email?: string; role?: ManagerRole; employeeId?: string | null },
+) {
   return prisma.managerAccount.update({ where: { id }, data, select: accountSelect });
 }
 

@@ -9,6 +9,7 @@ import type { JwtPayload } from '../middlewares/authenticate.middleware.js';
 export interface RefreshTokenPayload {
   managerAccountId: string;
   role: ManagerRole;
+  employeeId: string | null;
 }
 
 export function signAccessToken(payload: JwtPayload): string {

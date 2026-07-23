@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { useManagerAccountStore } from "@/features/manager-account/manager-account.store";
 import { useEmployeeStore } from "@/features/employee/employee.store";
+import type { ManagerAccount } from "@/features/manager-account/manager-account.types";
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
 import { getErrorMessage } from "@/lib/error";
@@ -44,7 +45,7 @@ export default function ManagerAccountsPage() {
 }
 
 function ManagerAccountsContent() {
-  const { data, total, page, limit, loading, fetchAll, create, setActive, resetPassword, remove } =
+  const { data, total, page, limit, loading, fetchAll, create, update, setActive, resetPassword, remove } =
     useManagerAccountStore();
   const toast = useToast();
   const confirm = useConfirm();
@@ -54,12 +55,18 @@ function ManagerAccountsContent() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [accountRole, setAccountRole] = useState<"MANAGER" | "STAFF">("MANAGER");
   const [employeeId, setEmployeeId] = useState(NONE_EMPLOYEE);
   const [formError, setFormError] = useState<string | null>(null);
   const [requestedPage, setRequestedPage] = useState(1);
 
   const [resetTarget, setResetTarget] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
+
+  const [editTarget, setEditTarget] = useState<ManagerAccount | null>(null);
+  const [editRole, setEditRole] = useState<"MANAGER" | "STAFF">("MANAGER");
+  const [editEmployeeId, setEditEmployeeId] = useState(NONE_EMPLOYEE);
+  const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAll({ page: requestedPage, limit: 9 });
@@ -72,16 +79,21 @@ function ManagerAccountsContent() {
   async function handleCreate() {
     setFormError(null);
     if (!email.trim() || !password.trim()) return;
+    if (accountRole === "STAFF" && employeeId === NONE_EMPLOYEE) {
+      setFormError("Tài khoản STAFF bắt buộc phải gắn với 1 nhân viên");
+      return;
+    }
     try {
       await create({
         email: email.trim(),
         password,
-        role: "MANAGER",
+        role: accountRole,
         employeeId: employeeId === NONE_EMPLOYEE ? undefined : employeeId,
       });
-      toast.success("Đã thêm tài khoản quản lý");
+      toast.success("Đã thêm tài khoản");
       setEmail("");
       setPassword("");
+      setAccountRole("MANAGER");
       setEmployeeId(NONE_EMPLOYEE);
       setOpen(false);
     } catch (err) {
@@ -117,6 +129,31 @@ function ManagerAccountsContent() {
       toast.success(isActive ? "Đã mở khóa tài khoản" : "Đã khóa tài khoản");
     } catch (err) {
       toast.error(getErrorMessage(err));
+    }
+  }
+
+  function openEdit(acc: ManagerAccount) {
+    setEditTarget(acc);
+    setEditRole(acc.role === "STAFF" ? "STAFF" : "MANAGER");
+    setEditEmployeeId(acc.employeeId ?? NONE_EMPLOYEE);
+    setEditError(null);
+  }
+
+  async function handleSaveEdit() {
+    if (!editTarget) return;
+    if (editRole === "STAFF" && editEmployeeId === NONE_EMPLOYEE) {
+      setEditError("Tài khoản STAFF bắt buộc phải gắn với 1 nhân viên");
+      return;
+    }
+    try {
+      await update(editTarget.id, {
+        role: editRole,
+        employeeId: editEmployeeId === NONE_EMPLOYEE ? null : editEmployeeId,
+      });
+      toast.success("Đã cập nhật tài khoản, tài khoản này sẽ bị đăng xuất để nhận thông tin mới");
+      setEditTarget(null);
+    } catch (err) {
+      setEditError(getErrorMessage(err));
     }
   }
 
@@ -164,7 +201,27 @@ function ManagerAccountsContent() {
                 />
               </div>
               <div className="space-y-1">
-                <Label>Gắn với nhân viên (không bắt buộc)</Label>
+                <Label>Quyền</Label>
+                <Select
+                  value={accountRole}
+                  onValueChange={(v) => {
+                    setAccountRole(v as "MANAGER" | "STAFF");
+                    if (v === "STAFF") setFormError(null);
+                  }}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue>
+                      {(value: string) => (value === "STAFF" ? "STAFF - Nhân viên tự xem" : "MANAGER - Quản lý")}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MANAGER">MANAGER - Quản lý</SelectItem>
+                    <SelectItem value="STAFF">STAFF - Nhân viên tự xem</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label>{accountRole === "STAFF" ? "Gắn với nhân viên (bắt buộc)" : "Gắn với nhân viên (không bắt buộc)"}</Label>
                 <Select value={employeeId} onValueChange={(v) => setEmployeeId(v as string)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Không gắn nhân viên nào">
@@ -218,6 +275,9 @@ function ManagerAccountsContent() {
             </p>
             {acc.role !== "OWNER" && (
               <div className="mt-auto flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => openEdit(acc)}>
+                  Sửa
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -257,6 +317,64 @@ function ManagerAccountsContent() {
           </div>
           <DialogFooter>
             <Button onClick={handleResetPassword}>Xác nhận</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editTarget !== null} onOpenChange={(v) => !v && setEditTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sửa tài khoản {editTarget?.email}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label>Quyền</Label>
+              <Select
+                value={editRole}
+                onValueChange={(v) => {
+                  setEditRole(v as "MANAGER" | "STAFF");
+                  setEditError(null);
+                }}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue>
+                    {(value: string) => (value === "STAFF" ? "STAFF - Nhân viên tự xem" : "MANAGER - Quản lý")}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MANAGER">MANAGER - Quản lý</SelectItem>
+                  <SelectItem value="STAFF">STAFF - Nhân viên tự xem</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label>{editRole === "STAFF" ? "Gắn với nhân viên (bắt buộc)" : "Gắn với nhân viên (không bắt buộc)"}</Label>
+              <Select value={editEmployeeId} onValueChange={(v) => setEditEmployeeId(v as string)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Không gắn nhân viên nào">
+                    {(value: string) => {
+                      if (value === NONE_EMPLOYEE) return "Không gắn nhân viên nào";
+                      const emp = employees.find((x) => x.id === value);
+                      return emp ? `${emp.code} — ${emp.fullName}` : "Không gắn nhân viên nào";
+                    }}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE_EMPLOYEE}>Không gắn nhân viên nào</SelectItem>
+                  {employees.map((emp) => (
+                    <SelectItem key={emp.id} value={emp.id}>
+                      {emp.code} — {emp.fullName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {editError && <p className="text-sm text-destructive">{editError}</p>}
+          </div>
+
+          <DialogFooter>
+            <Button onClick={handleSaveEdit}>Lưu</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

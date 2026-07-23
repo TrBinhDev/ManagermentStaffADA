@@ -106,10 +106,17 @@
       "Bash(curl -s -o /dev/null -w \"overview=%{http_code}\\\\n\" http://localhost:8080/overview)",
       "Bash(command -v k6)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/auth/login --max-time 3)",
-      "PowerShell(cd \"f:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File run-load-test-attendance.ps1)"
+      "PowerShell(cd \"f:\\\\Project\\\\ManagermentStaffADA\\\\app\\\\server\"; powershell -File run-load-test-attendance.ps1)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\Admin\\\\.claude\\\\projects\\\\f--Project-ManagermentStaffADA\\\\memory\" 2>/dev/null; echo done)",
+      "Bash(ls \"C:\\\\Users\\\\Admin\\\\.claude\\\\projects\\\\f--Project-ManagermentStaffADA\\\\memory\\\\\" 2>/dev/null)",
+      "Read(//c/Users/Admin/.claude/projects/f--Project-ManagermentStaffADA/memory\" 2>/dev/**)",
+      "Bash(ls -la \"/c/Users/Admin/.claude/projects/f--Project-ManagermentStaffADA/memory/\")",
+      "Bash(curl -s -o /dev/null -w \"web: %{http_code}\\\\n\" http://localhost:8080 --max-time 3)",
+      "Bash(curl -s -o /dev/null -w \"server: %{http_code}\\\\n\" http://localhost:3000/auth/login --max-time 3)"
     ],
     "additionalDirectories": [
-      "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA"
+      "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA",
+      "C:\\Users\\Admin\\.claude\\projects\\f--Project-ManagermentStaffADA\\memory"
     ]
   }
 }

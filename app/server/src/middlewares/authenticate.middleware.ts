@@ -8,6 +8,7 @@ import { env } from "../config/env.js";
 export interface JwtPayload {
   managerAccountId: string;
   role: ManagerRole;
+  employeeId: string | null;
 }
 
 declare global {

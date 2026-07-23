@@ -20,8 +20,8 @@ export async function login({ email, password }: LoginInput) {
     throw new UnauthorizedError(Message.AUTH.INVALID_CREDENTIALS, 'INVALID_CREDENTIALS');
   }
 
-  const accessToken = signAccessToken({ managerAccountId: account.id, role: account.role });
-  const refreshToken = signRefreshToken({ managerAccountId: account.id, role: account.role });
+  const accessToken = signAccessToken({ managerAccountId: account.id, role: account.role, employeeId: account.employeeId });
+  const refreshToken = signRefreshToken({ managerAccountId: account.id, role: account.role, employeeId: account.employeeId });
   await setSession(account.id, refreshToken);
 
   return { accessToken, refreshToken, role: account.role };
@@ -39,8 +39,8 @@ export async function refreshSession(refreshToken: string | undefined) {
     throw new UnauthorizedError(Message.COMMON.UNAUTHORIZED, 'SESSION_EXPIRED');
   }
 
-  const accessToken = signAccessToken({ managerAccountId: payload.managerAccountId, role: payload.role });
-  const newRefreshToken = signRefreshToken({ managerAccountId: payload.managerAccountId, role: payload.role });
+  const accessToken = signAccessToken({ managerAccountId: payload.managerAccountId, role: payload.role, employeeId: payload.employeeId });
+  const newRefreshToken = signRefreshToken({ managerAccountId: payload.managerAccountId, role: payload.role, employeeId: payload.employeeId });
   await setSession(payload.managerAccountId, newRefreshToken);
 
   return { accessToken, refreshToken: newRefreshToken };

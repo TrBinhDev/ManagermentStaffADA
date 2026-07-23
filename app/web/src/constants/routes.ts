@@ -10,4 +10,8 @@ export const ROUTES = {
   employees: "/employees",
   managerAccounts: "/manager-accounts",
   settings: "/settings",
+  myWorkSchedule: "/me/work-schedule",
+  myAttendance: "/me/attendance",
+  myPayments: "/me/payments",
+  myProfile: "/me/profile",
 } as const;
