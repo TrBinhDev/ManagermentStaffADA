@@ -84,6 +84,7 @@ export const Message = {
     NO_POSITION_HISTORY: "Không tìm thấy lịch sử vị trí phù hợp với ngày làm việc này",
     NO_SALARY_RATE:
       "Vị trí chưa có mức lương được thiết lập, không thể tính lương. Vui lòng đặt mức lương trước khi chấm công ra",
+    TOO_EARLY: "Chưa tới giờ chấm công, được phép chấm công trước giờ vào ca tối đa 5 phút",
   },
 
   DAILY_PAYMENT: {

@@ -9,10 +9,25 @@ import { useToast } from "@/components/toast/toast-context";
 import { getErrorMessage } from "@/lib/error";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 function toDateOnly(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+const EARLY_CHECKIN_GRACE_MS = 5 * 60 * 1000;
+function isTooEarlyToCheckIn(workDate: string, startTime: string) {
+  const [year, month, day] = workDate.split("-").map(Number);
+  const [hours, minutes] = startTime.split(":").map(Number);
+  const shiftStartAt = new Date(year, month - 1, day, hours, minutes);
+  return Date.now() < shiftStartAt.getTime() - EARLY_CHECKIN_GRACE_MS;
 }
 
 export default function TodayAttendancePage() {
@@ -21,7 +36,9 @@ export default function TodayAttendancePage() {
   const [todayMonth] = useState(() => new Date().getMonth() + 1);
   const [todayYear] = useState(() => new Date().getFullYear());
 
-  const [scheduleRows, setScheduleRows] = useState<WorkScheduleSummaryItem[]>([]);
+  const [scheduleRows, setScheduleRows] = useState<WorkScheduleSummaryItem[]>(
+    [],
+  );
   const [attendanceRows, setAttendanceRows] = useState<AttendanceItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +48,9 @@ export default function TodayAttendancePage() {
       workScheduleApi.fetchAllWorkSchedule(todayMonth, todayYear),
       attendanceApi.fetchAttendance({ from: today, to: today, limit: 100 }),
     ]);
-    setScheduleRows(scheduleResult.filter((row) => row.workDate.slice(0, 10) === today));
+    setScheduleRows(
+      scheduleResult.filter((row) => row.workDate.slice(0, 10) === today),
+    );
     setAttendanceRows(attendanceResult.data);
     setLoading(false);
   }, [today, todayMonth, todayYear]);
@@ -44,22 +63,30 @@ export default function TodayAttendancePage() {
   const groups = useMemo(() => {
     const byShift = new Map<
       string,
-      { shift: WorkScheduleSummaryItem["shift"]; rows: WorkScheduleSummaryItem[] }
+      {
+        shift: WorkScheduleSummaryItem["shift"];
+        rows: WorkScheduleSummaryItem[];
+      }
     >();
     for (const row of scheduleRows) {
-      if (!byShift.has(row.shiftId)) byShift.set(row.shiftId, { shift: row.shift, rows: [] });
+      if (!byShift.has(row.shiftId))
+        byShift.set(row.shiftId, { shift: row.shift, rows: [] });
       byShift.get(row.shiftId)!.rows.push(row);
     }
     return Array.from(byShift.values())
       .map((group) => ({
         ...group,
-        rows: [...group.rows].sort((a, b) => a.employee.fullName.localeCompare(b.employee.fullName)),
+        rows: [...group.rows].sort((a, b) =>
+          a.employee.fullName.localeCompare(b.employee.fullName),
+        ),
       }))
       .sort((a, b) => a.shift.startTime.localeCompare(b.shift.startTime));
   }, [scheduleRows]);
 
   function findAttendance(employeeId: string, shiftId: string) {
-    return attendanceRows.find((a) => a.employeeId === employeeId && a.shiftId === shiftId);
+    return attendanceRows.find(
+      (a) => a.employeeId === employeeId && a.shiftId === shiftId,
+    );
   }
 
   async function handleCheckIn(employeeId: string, shiftId: string) {
@@ -87,24 +114,38 @@ export default function TodayAttendancePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Chấm công hôm nay</h1>
         <p className="text-sm text-muted-foreground">
-          {new Date().toLocaleDateString("vi-VN", { weekday: "long", day: "2-digit", month: "2-digit", year: "numeric" })}
+          {new Date().toLocaleDateString("vi-VN", {
+            weekday: "long",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })}
         </p>
       </div>
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
       {!loading && groups.length === 0 && (
-        <p className="text-sm text-muted-foreground">Hôm nay chưa có ai được xếp lịch làm việc.</p>
+        <p className="text-sm text-muted-foreground">
+          Hôm nay chưa có ai được xếp lịch làm việc.
+        </p>
       )}
 
       {!loading &&
-        groups.map(({ shift, rows }) => (
-          <div key={shift.id} className="space-y-2 rounded-2xl border border-border/60 bg-card/60 p-4">
+        groups.map(({ shift, rows }) => {
+          const tooEarly = isTooEarlyToCheckIn(today, shift.startTime);
+          return (
+          <div
+            key={shift.id}
+            className="space-y-2 rounded-2xl border border-border/60 bg-card/60 p-4"
+          >
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-semibold">{shift.name}</h2>
               <Badge variant="secondary">
                 {shift.startTime}–{shift.endTime}
               </Badge>
-              <span className="text-xs text-muted-foreground">{rows.length} nhân viên</span>
+              <span className="text-xs text-muted-foreground">
+                {rows.length} nhân viên
+              </span>
             </div>
 
             <Table className="table-fixed">
@@ -118,7 +159,10 @@ export default function TodayAttendancePage() {
               </TableHeader>
               <TableBody>
                 {rows.map((row) => {
-                  const attendance = findAttendance(row.employeeId, row.shiftId);
+                  const attendance = findAttendance(
+                    row.employeeId,
+                    row.shiftId,
+                  );
                   return (
                     <TableRow key={row.id}>
                       <TableCell className="truncate">
@@ -126,14 +170,18 @@ export default function TodayAttendancePage() {
                       </TableCell>
                       <TableCell className="text-center tabular-nums">
                         {attendance?.checkedInAt ? (
-                          new Date(attendance.checkedInAt).toLocaleTimeString("vi-VN")
+                          new Date(attendance.checkedInAt).toLocaleTimeString(
+                            "vi-VN",
+                          )
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell className="text-center tabular-nums">
                         {attendance?.checkedOutAt ? (
-                          new Date(attendance.checkedOutAt).toLocaleTimeString("vi-VN")
+                          new Date(attendance.checkedOutAt).toLocaleTimeString(
+                            "vi-VN",
+                          )
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
@@ -143,17 +191,31 @@ export default function TodayAttendancePage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleCheckIn(row.employeeId, row.shiftId)}
+                            disabled={tooEarly}
+                            title={
+                              tooEarly
+                                ? "Chưa tới giờ chấm công, được phép trước giờ vào ca 5 phút"
+                                : undefined
+                            }
+                            onClick={() =>
+                              handleCheckIn(row.employeeId, row.shiftId)
+                            }
                           >
                             Chấm công vào
                           </Button>
                         )}
                         {attendance && !attendance.checkedOutAt && (
-                          <Button size="sm" variant="outline" onClick={() => handleCheckOut(attendance.id)}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCheckOut(attendance.id)}
+                          >
                             Chấm công ra
                           </Button>
                         )}
-                        {attendance?.checkedOutAt && <Badge variant="secondary">Hoàn tất</Badge>}
+                        {attendance?.checkedOutAt && (
+                          <Badge variant="secondary">Hoàn tất</Badge>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
@@ -161,7 +223,8 @@ export default function TodayAttendancePage() {
               </TableBody>
             </Table>
           </div>
-        ))}
+          );
+        })}
     </div>
   );
 }

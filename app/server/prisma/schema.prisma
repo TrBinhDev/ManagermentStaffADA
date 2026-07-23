@@ -19,6 +19,7 @@ enum EmployeeStatus {
 enum ManagerRole {
   OWNER
   MANAGER
+  STAFF
 }
 
 // ============================================================

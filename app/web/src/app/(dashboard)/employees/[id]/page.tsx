@@ -621,6 +621,13 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
     return workDateUTC > todayUTC;
   }
 
+  function isTooEarlyToCheckIn(workDate: string, startTime: string) {
+    const [year, month, day] = workDate.slice(0, 10).split("-").map(Number);
+    const [hours, minutes] = startTime.split(":").map(Number);
+    const shiftStartAt = new Date(year, month - 1, day, hours, minutes);
+    return now.getTime() < shiftStartAt.getTime() - 5 * 60 * 1000;
+  }
+
   async function handleCheckIn(shiftId: string, workDate: string) {
     try {
       await attendanceApi.checkIn({ employeeId, shiftId, workDate: workDate.slice(0, 10) });
@@ -674,6 +681,8 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
         <TableBody>
           {scheduleRows.map((row) => {
             const attendance = findAttendance(row.shiftId, row.workDate);
+            const future = isFutureDay(row.workDate);
+            const tooEarly = !future && isTooEarlyToCheckIn(row.workDate, row.shift.startTime);
             return (
               <TableRow key={row.id}>
                 <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
@@ -689,8 +698,14 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
                     <Button
                       size="sm"
                       variant="outline"
-                      disabled={isFutureDay(row.workDate)}
-                      title={isFutureDay(row.workDate) ? "Chưa đến ngày làm việc, chưa thể chấm công" : undefined}
+                      disabled={future || tooEarly}
+                      title={
+                        future
+                          ? "Chưa đến ngày làm việc, chưa thể chấm công"
+                          : tooEarly
+                            ? "Chưa tới giờ chấm công, được phép trước giờ vào ca 5 phút"
+                            : undefined
+                      }
                       onClick={() => handleCheckIn(row.shiftId, row.workDate)}
                     >
                       Chấm công vào

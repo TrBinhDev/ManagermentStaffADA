@@ -1,12 +1,13 @@
 import { Prisma } from '@prisma/client';
 import { Message } from '../../constants/message.js';
 import { BadRequestError, NotFoundError, ConflictError } from '../../errors/AppError.js';
-import { parseDateOnly } from '../../utils/date.util.js';
+import { parseDateOnly, combineDateAndTime } from '../../utils/date.util.js';
 import * as attendanceRepository from './attendance.repository.js';
 import type { CheckInInput, ListAttendanceQuery } from './attendance.schema.js';
 
 const MS_PER_HOUR = 60 * 60 * 1000;
 const AMOUNT_ROUND_UNIT = 1000;
+const EARLY_CHECKIN_GRACE_MS = 5 * 60 * 1000;
 
 export async function checkIn({ employeeId, shiftId, workDate: workDateStr }: CheckInInput, performedById: string) {
   const employee = await attendanceRepository.findEmployeeById(employeeId);
@@ -27,6 +28,11 @@ export async function checkIn({ employeeId, shiftId, workDate: workDateStr }: Ch
   const schedule = await attendanceRepository.findWorkSchedule(employeeId, shiftId, workDate);
   if (!schedule) {
     throw new BadRequestError(Message.ATTENDANCE.NO_WORK_SCHEDULE, 'NO_WORK_SCHEDULE');
+  }
+
+  const shiftStartAt = combineDateAndTime(workDate, shift.startTime);
+  if (Date.now() < shiftStartAt.getTime() - EARLY_CHECKIN_GRACE_MS) {
+    throw new BadRequestError(Message.ATTENDANCE.TOO_EARLY, 'TOO_EARLY');
   }
 
   const existing = await attendanceRepository.findExistingAttendance(employeeId, shiftId, workDate);
