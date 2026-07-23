@@ -1,7 +1,6 @@
 import type { ManagerRole } from '@prisma/client';
 import { prisma } from '../../config/prisma.js';
 
-// select tuong minh (khong dung include) de KHONG BAO GIO tra passwordHash ra ngoai qua API.
 const accountSelect = {
   id: true,
   email: true,

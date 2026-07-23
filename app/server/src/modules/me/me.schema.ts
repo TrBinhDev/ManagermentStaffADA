@@ -2,8 +2,6 @@ import { z } from 'zod';
 
 const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
-// Giong listAttendanceQuerySchema goc nhung BO han field employeeId - STAFF khong duoc tu
-// truyen employeeId, luon lay tu token (xem me.controller.ts).
 export const meAttendanceQuerySchema = z.object({
   from: z.string().regex(DATE_ONLY_REGEX, 'Ngày không hợp lệ (định dạng YYYY-MM-DD)').optional(),
   to: z.string().regex(DATE_ONLY_REGEX, 'Ngày không hợp lệ (định dạng YYYY-MM-DD)').optional(),
@@ -12,9 +10,6 @@ export const meAttendanceQuerySchema = z.object({
 });
 export type MeAttendanceQuery = z.infer<typeof meAttendanceQuerySchema>;
 
-// Subset cua upsertEmployeeProfileSchema - BO cccd/cccdIssueDate/cccdIssuePlace (thong tin
-// dinh danh phap ly, phai qua admin xac nhan) va note (ghi chu noi bo HR, khong cho nhan
-// vien tu xem/sua).
 export const meUpdateProfileSchema = z.object({
   gender: z.string().trim().optional(),
   ethnicity: z.string().trim().optional(),

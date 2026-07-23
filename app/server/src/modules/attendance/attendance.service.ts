@@ -55,8 +55,7 @@ export async function checkOut(attendanceId: string, performedById: string) {
     throw new BadRequestError(Message.ATTENDANCE.ALREADY_CHECKED_OUT, 'ALREADY_CHECKED_OUT');
   }
 
-  // Vi tri thuc te tai thoi diem check-in (khong phai Employee.positionId hien tai va khong
-  // dung workDate vi workDate chi co do phan giai theo ngay) - xem docs/V4.md muc 6.
+
   const positionHistory = await attendanceRepository.findPositionHistoryAt(
     attendance.employeeId,
     attendance.checkedInAt!,
@@ -71,7 +70,6 @@ export async function checkOut(attendanceId: string, performedById: string) {
   }
 
   const checkedOutAt = new Date();
-  // Decimal-safe, khong dung phep toan Float thuong.
   const hoursWorked = new Prisma.Decimal(checkedOutAt.getTime() - attendance.checkedInAt.getTime()).dividedBy(
     MS_PER_HOUR,
   );

@@ -18,7 +18,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!isAuthenticated) {
       router.replace(ROUTES.login);
     } else if (role === "STAFF") {
-      // Khu vuc dashboard admin nay khong danh cho STAFF - dua ve khu vuc rieng cua ho.
       router.replace(ROUTES.myWorkSchedule);
     }
   }, [isBootstrapping, isAuthenticated, role, router]);

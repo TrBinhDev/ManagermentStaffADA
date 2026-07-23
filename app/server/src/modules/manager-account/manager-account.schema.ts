@@ -35,9 +35,6 @@ export const updateManagerAccountSchema = z.object({
   isActive: z.boolean().optional(),
   email: z.string().email("Email không hợp lệ").optional(),
   role: z.enum(["MANAGER", "STAFF"]).optional(),
-  // null = go lien ket nhan vien, undefined = giu nguyen, string = doi sang nhan vien khac
-  // (rieng rang buoc "STAFF bat buoc phai co employeeId" check o service vi phu thuoc trang
-  // thai hien tai trong DB, khong the check thuan schema)
   employeeId: z.string().min(1).nullable().optional(),
 });
 export type UpdateManagerAccountInput = z.infer<

@@ -37,15 +37,6 @@ export function findById(id: string) {
   return prisma.attendance.findUnique({ where: { id } });
 }
 
-// Vi tri THUC TE nhan vien giu tai thoi diem check-in (khong phai Employee.positionId hien
-// tai) - tra qua PositionHistory vi nhan vien co the da doi vi tri sau khi check-in nhung
-// truoc luc check-out.
-//
-// Dung dung `checkedInAt` (moc thoi gian chinh xac) thay vi `workDate` (chi co do phan giai
-// theo ngay) - vi PositionHistory.startDate/endDate la DateTime co gio, nhan vien co the doi
-// vi tri NGAY TRONG NGAY dang lam. Neu chi so theo workDate se khong biet chon dong nao khi
-// 2 dong PositionHistory cung "chong lan" trong 1 ngay - dung checkedInAt moi xac dinh dung
-// vi tri ho dang lam luc bat dau ca.
 export function findPositionHistoryAt(employeeId: string, at: Date) {
   return prisma.positionHistory.findFirst({
     where: {

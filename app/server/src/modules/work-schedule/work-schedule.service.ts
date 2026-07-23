@@ -25,8 +25,6 @@ export async function listAll({ month, year, shiftId }: ListAllWorkScheduleQuery
   return workScheduleRepository.findAllByRange(start, end, shiftId);
 }
 
-// Tra ve { created, rejected } thay vi nem loi khi 1 ngay bi day cho — moi ngay xu ly doc lap,
-// FE can biet chinh xac ngay nao thanh cong / ngay nao bi tu choi vi day vi tri trong ca.
 export async function bulkCreate(employeeId: string, { shiftId, workDates }: BulkCreateWorkScheduleInput) {
   const employee = await workScheduleRepository.findEmployeeById(employeeId);
   if (!employee) {
@@ -49,7 +47,6 @@ export async function bulkCreate(employeeId: string, { shiftId, workDates }: Bul
   for (const dateStr of workDates) {
     const workDate = parseDateOnly(dateStr);
 
-    // Da xep dung ngay/ca nay roi (vd bam lai) - coi la thanh cong, khong bao loi/tinh vao rejected.
     const existing = await workScheduleRepository.findExisting(employeeId, shiftId, workDate);
     if (existing) {
       created.push(dateStr);
@@ -109,8 +106,6 @@ export async function remove(scheduleId: string, employeeId: string): Promise<vo
     throw new NotFoundError(Message.WORK_SCHEDULE.NOT_FOUND, 'WORK_SCHEDULE_NOT_FOUND');
   }
 
-  // Da cham cong cho dung ca/ngay nay roi thi khong duoc go, tranh Attendance/DailyPayment
-  // con lai tro toi 1 ca lam da bi xoa khoi lich.
   const attendance = await findExistingAttendance(schedule.employeeId, schedule.shiftId, schedule.workDate);
   if (attendance) {
     throw new BadRequestError(Message.WORK_SCHEDULE.HAS_ATTENDANCE, 'WORK_SCHEDULE_HAS_ATTENDANCE');

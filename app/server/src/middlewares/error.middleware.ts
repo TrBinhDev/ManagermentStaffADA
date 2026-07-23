@@ -20,8 +20,6 @@ export function errorHandler(
     });
   }
 
-  // Luoi an toan: FK Restrict bi vi pham thang o DB (vd data tao tat qua fixture/script,
-  // khong di qua service check truoc) khong duoc de lo ra thanh 500 tho.
   if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2003") {
     return res.status(HttpStatus.CONFLICT).json({
       error: {

@@ -31,7 +31,6 @@ workScheduleRouter.patch(
 );
 workScheduleRouter.delete('/:id/work-schedule/:scheduleId', workScheduleController.remove);
 
-// Tab tong hop toan nha hang, khong thuoc rieng 1 nhan vien - mount o path rieng /work-schedule.
 export const workScheduleSummaryRouter = Router();
 
 workScheduleSummaryRouter.use(authenticate, authorize('OWNER', 'MANAGER'));

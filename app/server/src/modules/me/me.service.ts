@@ -6,8 +6,6 @@ import type { ListEmployeePaymentsQuery } from '../daily-payment/daily-payment.s
 import * as employeeProfileService from '../employee-profile/employee-profile.service.js';
 import type { MeAttendanceQuery, MeUpdateProfileInput } from './me.schema.js';
 
-// Tat ca ham o day chi la wrapper mong, ep employeeId luon lay tu token (khong nhan tu
-// client) roi goi thang service goc cua module tuong ung - khong lap lai nghiep vu.
 
 export function listWorkSchedule(employeeId: string, query: ListEmployeeWorkScheduleQuery) {
   return workScheduleService.listByEmployee(employeeId, query);

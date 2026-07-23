@@ -6,9 +6,6 @@ import type { ListEmployeeWorkScheduleQuery } from '../work-schedule/work-schedu
 import type { ListEmployeePaymentsQuery } from '../daily-payment/daily-payment.schema.js';
 import type { MeAttendanceQuery, MeUpdateProfileInput } from './me.schema.js';
 
-// employeeId luon lay tu req.user (JWT, nhung o authenticate.middleware.ts, task 2 da them),
-// KHONG bao gio lay tu query/param - day la diem khac biet duy nhat so voi cac route admin
-// goc ma cac ham nay bao boc lai.
 
 export const listWorkSchedule = asyncHandler(async (req: Request, res: Response) => {
   const query = req.query as unknown as ListEmployeeWorkScheduleQuery;

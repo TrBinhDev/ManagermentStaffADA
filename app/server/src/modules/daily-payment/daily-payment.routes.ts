@@ -15,7 +15,6 @@ dailyPaymentRouter.get(
   dailyPaymentController.listByEmployee,
 );
 
-// Tab tong hop toan nha hang, khong thuoc rieng 1 nhan vien - mount o path rieng /payments.
 export const dailyPaymentSummaryRouter = Router();
 
 dailyPaymentSummaryRouter.use(authenticate, authorize('OWNER', 'MANAGER'));

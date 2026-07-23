@@ -9,8 +9,6 @@ import * as meController from './me.controller.js';
 
 export const meRouter = Router();
 
-// Chi STAFF duoc goi cac route nay - OWNER/MANAGER da co route day du rieng (co employeeId
-// tren query/param), khong can dung lai /me/* lam gi.
 meRouter.use(authenticate, authorize('STAFF'));
 
 meRouter.get(

@@ -17,8 +17,6 @@ export function findOpenRate(positionId: string) {
   });
 }
 
-// Dong muc dang mo (neu co) va tao muc moi trong cung 1 transaction — khong bao gio
-// duoc de xay ra tinh trang 2 muc cung "dang mo" mot luc cho 1 Position.
 export function createRate(positionId: string, hourlyRate: number, openRateId: string | undefined, effectiveDate: Date) {
   return prisma.$transaction(async (tx) => {
     if (openRateId) {

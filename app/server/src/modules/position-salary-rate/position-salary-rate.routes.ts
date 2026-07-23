@@ -10,8 +10,6 @@ export const positionSalaryRateRouter = Router();
 positionSalaryRateRouter.use(authenticate);
 
 positionSalaryRateRouter.get('/:id/salary-rates', positionSalaryRateController.list);
-// Tao muc luong moi gioi han OWNER-only — quyet dinh tai chinh cap cao, khac cac API
-// van hanh hang ngay (chấm cong, xep lich) ma MANAGER can lam. Xem docs/V4.md muc 1.
 positionSalaryRateRouter.post(
   '/:id/salary-rates',
   authorize('OWNER'),

@@ -10,8 +10,6 @@ async function ensureShiftExists(shiftId: string) {
   }
 }
 
-// Capacity duoc truy cap qua URL long /shifts/:id/capacities/:capacityId - phai kiem tra
-// capacityId do thuc su thuoc ve shiftId trong URL, tranh 1 shift sua/xoa nham capacity cua shift khac.
 async function ensureCapacityBelongsToShift(shiftId: string, capacityId: string) {
   const capacity = await capacityRepository.findById(capacityId);
   if (!capacity || capacity.shiftId !== shiftId) {

@@ -119,8 +119,6 @@ export async function update(
     }
   }
 
-  // employeeId undefined = giu nguyen gia tri cu, null = go lien ket, string = doi sang nhan
-  // vien khac - phai tinh truoc "gia tri sau khi update" de check dung rang buoc STAFF ben duoi.
   const nextEmployeeId = employeeId === undefined ? account.employeeId : employeeId;
   const nextRole = role ?? account.role;
 
@@ -162,8 +160,6 @@ export async function update(
     employeeId,
   });
 
-  // Doi employeeId/role thi phai buoc dang xuat - access/refresh token cu van con mang gia
-  // tri CU vi refreshSession() khong query lai DB (chi ky lai token tu payload token cu).
   if (isActive === false || employeeId !== undefined || role !== undefined) {
     await deleteSession(id);
   }
