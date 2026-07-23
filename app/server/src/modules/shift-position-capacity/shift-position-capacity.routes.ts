@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
+import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
 import { createCapacitySchema, updateCapacitySchema } from './shift-position-capacity.schema.js';
 import * as capacityController from './shift-position-capacity.controller.js';
 
 export const shiftPositionCapacityRouter = Router();
 
-shiftPositionCapacityRouter.use(authenticate);
+shiftPositionCapacityRouter.use(authenticate, authorize('OWNER', 'MANAGER'));
 
 shiftPositionCapacityRouter.get('/:id/capacities', capacityController.list);
 shiftPositionCapacityRouter.post('/:id/capacities', validate(createCapacitySchema), capacityController.create);

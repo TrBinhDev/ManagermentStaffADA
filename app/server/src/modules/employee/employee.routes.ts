@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
+import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
 import {
   listEmployeeQuerySchema,
@@ -11,7 +12,7 @@ import * as employeeController from './employee.controller.js';
 
 export const employeeRouter = Router();
 
-employeeRouter.use(authenticate);
+employeeRouter.use(authenticate, authorize('OWNER', 'MANAGER'));
 
 employeeRouter.get('/', validate(listEmployeeQuerySchema, 'query'), employeeController.list);
 employeeRouter.get('/:id', employeeController.getById);
