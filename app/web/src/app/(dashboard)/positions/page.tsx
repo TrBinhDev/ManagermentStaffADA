@@ -148,10 +148,10 @@ export default function PositionsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Vị trí</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Vị trí</h1>
 
-      <div className="flex flex-wrap gap-4 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="flex flex-wrap gap-4 rounded-xl border border-border bg-card p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Lọc theo phòng ban</p>
           <Select
@@ -200,7 +200,7 @@ export default function PositionsPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border bg-card p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Tên vị trí</p>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Tên vị trí" />
@@ -231,7 +231,7 @@ export default function PositionsPage() {
         {data.map((pos) => (
           <div
             key={pos.id}
-            className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
             <div>
               <div className="flex items-start justify-between gap-2">

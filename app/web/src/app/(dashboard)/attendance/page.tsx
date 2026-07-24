@@ -112,7 +112,7 @@ export default function TodayAttendancePage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Chấm công hôm nay</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Chấm công hôm nay</h1>
         <p className="text-sm text-muted-foreground">
           {new Date().toLocaleDateString("vi-VN", {
             weekday: "long",
@@ -136,7 +136,7 @@ export default function TodayAttendancePage() {
           return (
           <div
             key={shift.id}
-            className="space-y-2 rounded-2xl border border-border/60 bg-card/60 p-4"
+            className="space-y-2 rounded-xl border border-border bg-card p-4 shadow-sm"
           >
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-semibold">{shift.name}</h2>

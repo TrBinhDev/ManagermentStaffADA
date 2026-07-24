@@ -39,18 +39,21 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-sm space-y-6">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold">Cài đặt</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Cài đặt</h1>
         {user && (
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {user.email} — {user.role}
           </p>
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 rounded-lg border p-4">
-        <h2 className="text-sm font-medium">Đổi mật khẩu</h2>
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-sm space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm"
+      >
+        <h2 className="text-sm font-semibold">Đổi mật khẩu</h2>
 
         <div className="space-y-2">
           <Label htmlFor="oldPassword">Mật khẩu cũ</Label>

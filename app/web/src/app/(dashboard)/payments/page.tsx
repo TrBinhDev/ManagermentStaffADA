@@ -29,10 +29,10 @@ export default function PaymentsPage() {
   }, [month, year]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Lương</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Lương</h1>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border bg-card p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Tháng</p>
           <Input
@@ -50,9 +50,9 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-linear-to-br from-primary to-accent p-5 text-primary-foreground shadow-md shadow-primary/25">
-        <p className="text-xs opacity-80">Tổng lương toàn nhà hàng</p>
-        <p className="text-2xl font-bold">{grandTotal.toLocaleString("vi-VN")}đ</p>
+      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
+        <p className="text-sm font-medium text-muted-foreground">Tổng lương toàn nhà hàng</p>
+        <p className="mt-2 text-2xl font-bold">{grandTotal.toLocaleString("vi-VN")}đ</p>
       </div>
 
       {!loading && data.length === 0 && (
@@ -63,7 +63,7 @@ export default function PaymentsPage() {
         {data.map((row) => (
           <div
             key={row.employeeId}
-            className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+            className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
             <p className="truncate text-base font-semibold" title={row.fullName}>
               {row.fullName}

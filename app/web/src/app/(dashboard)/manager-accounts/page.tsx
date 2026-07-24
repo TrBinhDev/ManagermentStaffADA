@@ -33,7 +33,7 @@ export default function ManagerAccountsPage() {
 
   useEffect(() => {
     if (role && role !== "OWNER") {
-      router.replace(ROUTES.departments);
+      router.replace(ROUTES.overview);
     }
   }, [role, router]);
 
@@ -175,9 +175,12 @@ function ManagerAccountsContent() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Tài khoản quản lý</h1>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Tài khoản quản lý</h1>
+          <p className="text-sm text-muted-foreground">Quản lý tài khoản đăng nhập của quản lý và nhân viên</p>
+        </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger render={<Button />}>Thêm tài khoản</DialogTrigger>
@@ -260,7 +263,7 @@ function ManagerAccountsContent() {
         {data.map((acc) => (
           <div
             key={acc.id}
-            className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+            className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-2">
               <p className="truncate font-semibold" title={acc.email}>

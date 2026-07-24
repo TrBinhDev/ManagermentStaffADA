@@ -12,7 +12,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isBootstrapping) return;
-    router.replace(isAuthenticated ? ROUTES.departments : ROUTES.login);
+    router.replace(isAuthenticated ? ROUTES.overview : ROUTES.login);
   }, [isBootstrapping, isAuthenticated, router]);
 
   return null;

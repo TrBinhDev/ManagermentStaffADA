@@ -19,7 +19,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
       router.replace(ROUTES.login);
     } else if (role !== "STAFF") {
       // Khu vuc nay chi danh cho STAFF - OWNER/MANAGER vao nham thi dua ve dashboard admin.
-      router.replace(ROUTES.departments);
+      router.replace(ROUTES.overview);
     }
   }, [isBootstrapping, isAuthenticated, role, router]);
 

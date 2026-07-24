@@ -177,10 +177,10 @@ export default function ShiftsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Ca làm việc</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Ca làm việc</h1>
 
-      <div className="space-y-1 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="space-y-1 rounded-xl border border-border bg-card p-3">
         <p className="text-xs text-muted-foreground">Trạng thái</p>
         <Select
           value={filterIsActive === null ? ALL_STATUS : String(filterIsActive)}
@@ -199,7 +199,7 @@ export default function ShiftsPage() {
         </Select>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border bg-card p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Tên ca</p>
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="VD: Ca sáng" />
@@ -223,7 +223,7 @@ export default function ShiftsPage() {
         {data.map((shift) => (
           <div
             key={shift.id}
-            className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-2">
               <p className="truncate text-base font-semibold" title={shift.name}>

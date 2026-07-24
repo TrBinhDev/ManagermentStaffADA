@@ -58,7 +58,7 @@ export default function EmployeeDetailPage({ params }: { params: Promise<{ id: s
         </Link>
       </div>
 
-      <h1 className="text-xl font-semibold">Chi tiết nhân viên</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Chi tiết nhân viên</h1>
 
       <div className="flex gap-1 border-b">
         {TABS.map((t) => (

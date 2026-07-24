@@ -79,10 +79,10 @@ export default function DepartmentsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Phòng ban</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Phòng ban</h1>
 
-      <div className="flex gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="flex gap-2 rounded-xl border border-border bg-card p-3">
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -100,7 +100,7 @@ export default function DepartmentsPage() {
         {data.map((dept) => (
           <div
             key={dept.id}
-            className="group flex flex-col gap-3 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+            className="group flex flex-col gap-3 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
             <p className="truncate text-base font-semibold" title={dept.name}>
               {dept.name}

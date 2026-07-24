@@ -167,9 +167,9 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Nhân viên</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Nhân viên</h1>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger render={<Button />}>Thêm nhân viên</DialogTrigger>
@@ -219,7 +219,7 @@ export default function EmployeesPage() {
               </label>
 
               {createAccount && (
-                <div className="space-y-3 rounded-lg border border-border/60 p-3">
+                <div className="space-y-3 rounded-lg border border-border p-3">
                   <div className="space-y-1">
                     <Label htmlFor="accountEmail">Email đăng nhập</Label>
                     <Input
@@ -251,7 +251,7 @@ export default function EmployeesPage() {
         </Dialog>
       </div>
 
-      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-card/60 p-3">
+      <div className="flex flex-wrap items-end gap-2 rounded-xl border border-border bg-card p-3">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Trạng thái</p>
           <Select value={status} onValueChange={(v) => setStatus(v as EmployeeStatus | "ALL")}>
@@ -312,7 +312,7 @@ export default function EmployeesPage() {
             tabIndex={0}
             onClick={() => router.push(`/employees/${emp.id}`)}
             onKeyDown={(e) => e.key === "Enter" && router.push(`/employees/${emp.id}`)}
-            className="flex cursor-pointer flex-col gap-2 rounded-2xl border border-border/60 bg-card/60 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/10"
+            className="flex cursor-pointer flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-2">
               <p className="truncate font-semibold text-primary" title={emp.code}>

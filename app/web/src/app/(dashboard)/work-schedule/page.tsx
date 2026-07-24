@@ -93,8 +93,8 @@ export default function WorkSchedulePage() {
   }, [selectedDay, byDay]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Lịch làm việc</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Lịch làm việc</h1>
 
       <div className="flex flex-wrap items-end gap-2">
         <div className="space-y-1">
@@ -160,8 +160,8 @@ export default function WorkSchedulePage() {
                   type="button"
                   onClick={() => setSelectedDay(day)}
                   className={cn(
-                    "flex aspect-square flex-col items-start gap-1 rounded-xl border p-2 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
-                    isToday(day) ? "border-primary bg-primary/5" : "border-border/60 bg-card/60",
+                    "flex aspect-square flex-col items-start gap-1 rounded-lg border p-2 text-left shadow-sm transition-shadow hover:shadow-md",
+                    isToday(day) ? "border-primary bg-primary/5" : "border-border bg-card",
                     isPastDay(day) && "opacity-50",
                   )}
                 >
