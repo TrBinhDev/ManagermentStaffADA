@@ -17,6 +17,14 @@ function toDateOnly(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+// Format gon truc Y cho so tien lon (vd 5000000 -> "5tr") - khong dung so nguyen day du vi
+// se bi cat chu ("0000") do truc Y chi danh khoang rong co dinh, khong tu gian theo do dai text.
+function formatCompactVnd(value: number) {
+  if (value >= 1_000_000) return `${(value / 1_000_000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })}tr`;
+  if (value >= 1_000) return `${(value / 1_000).toLocaleString("vi-VN", { maximumFractionDigits: 0 })}k`;
+  return String(value);
+}
+
 interface Stats {
   activeEmployees: number;
   resignedEmployees: number;
@@ -174,7 +182,8 @@ export default function OverviewPage() {
                     tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                     axisLine={false}
                     tickLine={false}
-                    width={40}
+                    width={48}
+                    tickFormatter={(value) => formatCompactVnd(Number(value))}
                   />
                   <Tooltip
                     cursor={{ fill: "var(--muted)" }}
