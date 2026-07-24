@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { PanelLeft } from "lucide-react";
+import { MapPin, PanelLeft, Phone } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { StaffSidebar } from "@/components/layout/StaffSidebar";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { ROUTES } from "@/constants/routes";
+import { BUSINESS_INFO } from "@/constants/business";
 import { Button } from "@/components/ui/button";
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
@@ -49,6 +50,18 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
           >
             <PanelLeft className="size-4" />
           </Button>
+
+          <div className="hidden shrink-0 items-center gap-4 text-xs text-muted-foreground lg:flex">
+            <span className="flex items-center gap-1.5">
+              <MapPin className="size-3.5" />
+              {BUSINESS_INFO.address}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Phone className="size-3.5" />
+              {BUSINESS_INFO.phone}
+            </span>
+          </div>
+
           <ThemeToggle />
         </header>
 

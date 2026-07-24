@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { PanelLeft, Search, Settings } from "lucide-react";
+import { MapPin, PanelLeft, Phone, Settings } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { HeaderSearch } from "@/components/layout/HeaderSearch";
 import { ROUTES } from "@/constants/routes";
-import { Input } from "@/components/ui/input";
+import { BUSINESS_INFO } from "@/constants/business";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -51,11 +52,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <PanelLeft className="size-4" />
             </Button>
-            <div className="relative w-full max-w-sm">
-              <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Tìm kiếm..." className="pl-8" />
-            </div>
+            <HeaderSearch />
           </div>
+
+          <div className="hidden shrink-0 items-center gap-4 text-xs text-muted-foreground lg:flex">
+            <span className="flex items-center gap-1.5">
+              <MapPin className="size-3.5" />
+              {BUSINESS_INFO.address}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Phone className="size-3.5" />
+              {BUSINESS_INFO.phone}
+            </span>
+          </div>
+
           <div className="flex shrink-0 items-center gap-1">
             <ThemeToggle />
             <Link href={ROUTES.settings}>
