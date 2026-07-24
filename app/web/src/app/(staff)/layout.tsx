@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { PanelLeft } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { StaffSidebar } from "@/components/layout/StaffSidebar";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { ROUTES } from "@/constants/routes";
+import { Button } from "@/components/ui/button";
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -12,6 +15,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
   const isBootstrapping = useAuthStore((s) => s.isBootstrapping);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const role = useAuthStore((s) => s.role);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (isBootstrapping) return;
@@ -32,21 +36,28 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="relative flex h-screen overflow-hidden bg-linear-to-br from-[oklch(0.96_0.025_268)] via-background to-[oklch(0.96_0.03_55)] dark:from-[oklch(0.15_0.03_270)] dark:via-background dark:to-[oklch(0.16_0.03_260)]">
-      <div className="animate-float-a pointer-events-none absolute -top-32 -left-24 h-80 w-80 rounded-full bg-indigo-400/30 blur-3xl dark:bg-indigo-500/20" />
-      <div className="animate-float-b pointer-events-none absolute top-1/3 -right-32 h-96 w-96 rounded-full bg-fuchsia-400/25 blur-3xl dark:bg-fuchsia-500/15" />
-      <div className="animate-float-c pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-amber-300/25 blur-3xl dark:bg-amber-500/15" />
+    <div className="flex h-screen gap-3 overflow-hidden bg-muted/40 p-3">
+      <StaffSidebar open={sidebarOpen} />
 
-      <StaffSidebar />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm">
+        <header className="flex h-14 shrink-0 items-center justify-between gap-4 px-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={sidebarOpen ? "Ẩn thanh điều hướng" : "Hiện thanh điều hướng"}
+            onClick={() => setSidebarOpen((v) => !v)}
+          >
+            <PanelLeft className="size-4" />
+          </Button>
+          <ThemeToggle />
+        </header>
 
-      <main className="relative z-10 min-h-0 min-w-0 flex-1 overflow-y-auto p-6">
-        <div
-          key={pathname}
-          className="animate-in fade-in slide-in-from-bottom-2 duration-300 min-w-0 rounded-2xl border border-border/60 bg-card/80 p-6 shadow-lg shadow-primary/5 backdrop-blur-xl dark:shadow-black/20"
-        >
-          {children}
-        </div>
-      </main>
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-6">
+          <div key={pathname} className="animate-in fade-in duration-300 min-w-0">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

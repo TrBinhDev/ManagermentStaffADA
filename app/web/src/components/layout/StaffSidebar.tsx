@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Clock, Wallet, User, LogOut } from "lucide-react";
+import { CalendarDays, Clock, Wallet, User, LogOut, ChevronsUpDown } from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
@@ -14,50 +14,63 @@ const NAV_ITEMS = [
   { href: ROUTES.myProfile, label: "Hồ sơ của tôi", icon: User },
 ];
 
-export function StaffSidebar() {
+export function StaffSidebar({ open = true }: { open?: boolean }) {
   const pathname = usePathname();
+  const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
+
   return (
-    <aside className="relative z-10 flex w-60 shrink-0 flex-col gap-1 border-r border-sidebar-border bg-sidebar/80 p-4 backdrop-blur-xl">
-      <div className="mb-4 px-2 py-1">
-        <h1 className="text-lg font-extrabold tracking-tight">
-          <span className="text-foreground">Management</span>{" "}
-          <span className="bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">Staff ADA</span>
-        </h1>
+    <aside
+      className={cn(
+        "relative z-10 flex shrink-0 flex-col overflow-hidden bg-transparent transition-[width] duration-200",
+        open ? "w-64" : "w-0",
+      )}
+    >
+      <div className="flex h-full w-64 flex-col">
+        <div className="flex items-center gap-2 px-4 py-3.5">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-sidebar-foreground">Management Staff ADA</p>
+            <p className="truncate text-xs text-muted-foreground">Nhân viên</p>
+          </div>
+          <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
+        </div>
+
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+          {NAV_ITEMS.map((item) => {
+            const active = pathname.startsWith(item.href);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+                )}
+              >
+                <Icon className="size-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <button
+          onClick={() => logout()}
+          className="mx-2 mb-2 flex items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-sidebar-accent"
+        >
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
+            {initials}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-sidebar-foreground">STAFF</p>
+            <p className="truncate text-xs text-muted-foreground">{user?.email ?? ""}</p>
+          </div>
+          <LogOut className="size-4 shrink-0 text-muted-foreground" />
+        </button>
       </div>
-
-      {NAV_ITEMS.map((item) => {
-        const active = pathname.startsWith(item.href);
-        const Icon = item.icon;
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "group relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 transition-all duration-200 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
-            )}
-          >
-            <span
-              className={cn(
-                "absolute top-1/2 left-0 h-0 w-0.5 -translate-y-1/2 rounded-full bg-linear-to-b from-primary to-accent transition-all duration-200",
-                active && "h-5",
-              )}
-            />
-            <Icon className="size-4 shrink-0 transition-transform duration-200 group-hover:scale-110" />
-            {item.label}
-          </Link>
-        );
-      })}
-
-      <button
-        onClick={() => logout()}
-        className="mt-auto flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-destructive transition-colors duration-200 hover:bg-destructive/10"
-      >
-        <LogOut className="size-4 shrink-0" />
-        Đăng xuất
-      </button>
     </aside>
   );
 }

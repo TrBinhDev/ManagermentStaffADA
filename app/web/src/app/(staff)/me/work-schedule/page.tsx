@@ -26,8 +26,8 @@ export default function MyWorkSchedulePage() {
   }, [refetch]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Lịch làm của tôi</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Lịch làm của tôi</h1>
 
       <div className="flex flex-wrap items-end gap-2">
         <div className="space-y-1">

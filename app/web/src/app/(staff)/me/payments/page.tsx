@@ -30,8 +30,8 @@ export default function MyPaymentsPage() {
   }, [refetch]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Lương của tôi</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Lương của tôi</h1>
 
       <div className="flex flex-wrap items-end gap-2">
         <div className="space-y-1">
@@ -51,15 +51,15 @@ export default function MyPaymentsPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-linear-to-br from-primary to-accent p-5 text-primary-foreground shadow-md shadow-primary/25">
+      <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <div className="flex gap-8">
           <div>
-            <p className="text-xs opacity-80">Tổng giờ làm</p>
-            <p className="text-2xl font-bold">{totalHours.toLocaleString("vi-VN")}h</p>
+            <p className="text-sm font-medium text-muted-foreground">Tổng giờ làm</p>
+            <p className="mt-2 text-2xl font-bold">{totalHours.toLocaleString("vi-VN")}h</p>
           </div>
           <div>
-            <p className="text-xs opacity-80">Tổng lương</p>
-            <p className="text-2xl font-bold">{totalAmount.toLocaleString("vi-VN")}đ</p>
+            <p className="text-sm font-medium text-muted-foreground">Tổng lương</p>
+            <p className="mt-2 text-2xl font-bold">{totalAmount.toLocaleString("vi-VN")}đ</p>
           </div>
         </div>
       </div>

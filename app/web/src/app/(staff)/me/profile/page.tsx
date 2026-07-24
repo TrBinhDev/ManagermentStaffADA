@@ -84,8 +84,8 @@ export default function MyProfilePage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Hồ sơ của tôi</h1>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">Hồ sơ của tôi</h1>
       <p className="text-sm text-muted-foreground">
         CCCD và một số thông tin định danh khác chỉ quản lý mới sửa được - liên hệ quản lý nếu cần cập nhật.
       </p>
@@ -93,7 +93,7 @@ export default function MyProfilePage() {
       {loading ? (
         <p className="text-sm text-muted-foreground">Đang tải...</p>
       ) : (
-        <div className="max-w-2xl space-y-4 rounded-lg border p-4">
+        <div className="max-w-2xl space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
           <div className="grid grid-cols-2 gap-3">
             {FIELDS.map(({ key, label }) => (
               <div key={key} className="space-y-1">

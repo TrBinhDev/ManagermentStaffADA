@@ -123,14 +123,16 @@ export default function TodayAttendancePage() {
         </p>
       </div>
 
-      {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
+      {/* Chi an noi dung o lan tai dau tien (groups rong) - tu lan refetch thu 2 tro di (sau
+          khi cham cong vao/ra) giu nguyen bang cu hien thi, tranh giat/nhap nhay ca trang. */}
+      {loading && groups.length === 0 && <p className="text-sm text-muted-foreground">Đang tải...</p>}
       {!loading && groups.length === 0 && (
         <p className="text-sm text-muted-foreground">
           Hôm nay chưa có ai được xếp lịch làm việc.
         </p>
       )}
 
-      {!loading &&
+      {groups.length > 0 &&
         groups.map(({ shift, rows }) => {
           const tooEarly = isTooEarlyToCheckIn(today, shift.startTime);
           return (
