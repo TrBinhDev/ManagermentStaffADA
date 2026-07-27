@@ -1,13 +1,13 @@
 # ManagementStaffADA
 
-Hệ thống quản lý nhân viên nhà hàng — 2 role (`OWNER`, `MANAGER`), đăng nhập bằng email/password (JWT access + refresh token), quản lý phòng ban/vị trí/nhân viên, xếp ca, chấm công và tính lương theo giờ.
+Hệ thống quản lý nhân viên nhà hàng — 3 role (`OWNER`, `MANAGER`, `STAFF`), đăng nhập bằng email/password (JWT access + refresh token), quản lý phòng ban/vị trí/nhân viên, xếp ca, chấm công và tính lương theo giờ.
 
 ## Tech stack
 
 - **Backend:** Node.js, Express 5, TypeScript, Prisma ORM, PostgreSQL, Redis (session/refresh-token store)
 - **Auth:** JWT (access 15 phút / refresh 7 ngày, refresh token lưu ở httpOnly cookie), bcrypt cho password, AES-256-GCM cho dữ liệu nhạy cảm (CCCD), SHA-256 một chiều để chống trùng CCCD
 - **Validate:** Zod
-- **Frontend:** Next.js (App Router), Zustand (state cho các list CRUD), shadcn/Base UI + Tailwind
+- **Frontend:** Next.js (App Router), Zustand (state cho các list CRUD), shadcn/Base UI + Tailwind, Axios(Giúp cấu hình HTTP req/res)
 - **Money/hours math:** `Prisma.Decimal` (decimal.js) — không dùng `Float` để tránh sai số làm tròn lương
 - **Monorepo:** pnpm workspace
 
@@ -31,8 +31,8 @@ app/
         employee/
         employee-profile/
         manager-account/
-        position-history/
-        employment-period/
+        position-history/         
+        employment-period/         
         position-salary-rate/      # mức lương/giờ theo vị trí, có hiệu lực theo khoảng ngày
         shift/                     # ca làm việc (giờ bắt đầu/kết thúc)
         shift-position-capacity/   # số lượng tối đa mỗi vị trí trong 1 ca
@@ -131,24 +131,34 @@ REDIS_PASSWORD=...
 | `pnpm --filter server exec prisma migrate deploy` | Áp dụng migration                      |
 | `pnpm --filter server exec prisma studio`         | Xem/sửa dữ liệu qua UI                 |
 
+## Phân quyền
+
+| Role      | Đối tượng                                                 | Quyền hạn                                                                                                                                                                                |
+| --------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OWNER`   | Chủ nhà hàng (duy nhất, seed sẵn, không gắn `employeeId`) | Toàn quyền: CRUD phòng ban/vị trí/nhân viên, quản lý tài khoản MANAGER, set lương/giờ theo vị trí, xem toàn bộ lịch làm/chấm công/lương                                                  |
+| `MANAGER` | Quản lý (không giới hạn theo phòng ban/vị trí)            | CRUD phòng ban/vị trí/nhân viên, xếp ca, xem/sửa chấm công, xem lương toàn nhà hàng — trừ quản lý tài khoản MANAGER và set lương/giờ (chỉ OWNER)                                         |
+| `STAFF`   | Nhân viên (gắn với 1 `employeeId`)                        | Chỉ xem dữ liệu của chính mình: hồ sơ cá nhân, lịch làm việc, lịch sử chấm công, bảng lương, lịch sử vị trí/thời gian làm việc. Không có quyền sửa hồ sơ hay CRUD trên các resource khác |
+
+STAFF tự chấm công vào/ra của chính mình (`attendance` check-in/check-out) — không chấm công hộ nhân viên khác. Mọi endpoint đọc dữ liệu của STAFF đều tự lọc theo `employeeId` gắn với token, không nhận `employeeId` tuỳ ý từ client.
+
 ## Các module API
 
-| Module                    | Quyền                                    | Ghi chú                                                                                                                                                                               |
-| ------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `auth`                    | OWNER/MANAGER                            | login, logout, refresh, `/me`, change-password. Refresh token ở httpOnly cookie, session lưu Redis (single-session/account)                                                           |
-| `department`              | OWNER/MANAGER                            | CRUD phòng ban                                                                                                                                                                        |
-| `position`                | OWNER/MANAGER                            | CRUD vị trí, unique theo `(name, departmentId)` — 2 phòng ban khác nhau được trùng tên vị trí                                                                                         |
-| `employee`                | OWNER/MANAGER                            | CRUD nhân viên, sinh `code` tự động (`NV0001...`), chống trùng CCCD qua hash, resign/rehire                                                                                           |
-| `employee-profile`        | OWNER/MANAGER                            | Hồ sơ chi tiết nhân viên (CCCD mã hóa 2 chiều để hiển thị lại, địa chỉ, ngân hàng...)                                                                                                 |
-| `manager-account`         | **OWNER only**                           | Quản lý tài khoản đăng nhập của MANAGER — khóa tài khoản/đổi mật khẩu đều tự force-logout qua Redis                                                                                   |
-| `position-history`        | OWNER/MANAGER                            | `GET /employees/:id/position-history` — timeline các vị trí nhân viên đã/đang giữ, tự động ghi khi tạo/đổi vị trí/resign/rehire                                                       |
-| `employment-period`       | OWNER/MANAGER                            | `GET /employees/:id/employment-periods` — timeline các đợt làm việc liên tục, reset khi rehire                                                                                        |
-| `position-salary-rate`    | GET: OWNER/MANAGER, POST: **OWNER only** | `/positions/:id/salary-rates` — lương/giờ theo vị trí, có hiệu lực từ ngày nào; tạo mức mới tự đóng mức đang mở (`effectiveTo = hôm nay`)                                             |
-| `shift`                   | OWNER/MANAGER                            | CRUD ca làm việc (tên, giờ bắt đầu/kết thúc)                                                                                                                                          |
-| `shift-position-capacity` | OWNER/MANAGER                            | `/shifts/:id/capacities` — số lượng tối đa mỗi vị trí được xếp trong 1 ca                                                                                                             |
-| `work-schedule`           | OWNER/MANAGER                            | `/employees/:id/work-schedule` (xếp lịch, hỗ trợ bulk theo nhiều ngày) + `/work-schedule` (tab tổng hợp); chặn vượt `shift-position-capacity`, idempotent khi xếp trùng ngày/ca đã có |
-| `attendance`              | OWNER/MANAGER                            | Check-in yêu cầu có `work-schedule` khớp ngày/ca; check-out tính lương ngay trong 1 transaction                                                                                       |
-| `daily-payment`           | OWNER/MANAGER                            | `/employees/:id/daily-payment` + `/daily-payment` (tổng hợp toàn nhà hàng theo tháng) — sinh tự động khi check-out, không có API tạo/sửa tay                                          |
+| Module                    | Quyền                                                                                | Ghi chú                                                                                                                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth`                    | OWNER/MANAGER/STAFF                                                                  | login, logout, refresh, `/me`, change-password. Refresh token ở httpOnly cookie, session lưu Redis (single-session/account)                                                           |
+| `department`              | OWNER/MANAGER (GET: +STAFF)                                                          | CRUD phòng ban; STAFF chỉ xem                                                                                                                                                         |
+| `position`                | OWNER/MANAGER (GET: +STAFF)                                                          | CRUD vị trí, unique theo `(name, departmentId)` — 2 phòng ban khác nhau được trùng tên vị trí; STAFF chỉ xem                                                                          |
+| `employee`                | OWNER/MANAGER                                                                        | CRUD nhân viên, sinh `code` tự động (`NV0001...`), chống trùng CCCD qua hash, resign/rehire                                                                                           |
+| `employee-profile`        | OWNER/MANAGER, STAFF: xem hồ sơ chính mình                                           | Hồ sơ chi tiết nhân viên (CCCD mã hóa 2 chiều để hiển thị lại, địa chỉ, ngân hàng...)                                                                                                 |
+| `manager-account`         | **OWNER only**                                                                       | Quản lý tài khoản đăng nhập của MANAGER — khóa tài khoản/đổi mật khẩu đều tự force-logout qua Redis                                                                                   |
+| `position-history`        | OWNER/MANAGER, STAFF: xem của chính mình                                             | `GET /employees/:id/position-history` — timeline các vị trí nhân viên đã/đang giữ, tự động ghi khi tạo/đổi vị trí/resign/rehire                                                       |
+| `employment-period`       | OWNER/MANAGER, STAFF: xem của chính mình                                             | `GET /employees/:id/employment-periods` — timeline các đợt làm việc liên tục, reset khi rehire                                                                                        |
+| `position-salary-rate`    | GET: OWNER/MANAGER, POST: **OWNER only**                                             | `/positions/:id/salary-rates` — lương/giờ theo vị trí, có hiệu lực từ ngày nào; tạo mức mới tự đóng mức đang mở (`effectiveTo = hôm nay`)                                             |
+| `shift`                   | OWNER/MANAGER (GET: +STAFF)                                                          | CRUD ca làm việc (tên, giờ bắt đầu/kết thúc); STAFF chỉ xem                                                                                                                           |
+| `shift-position-capacity` | OWNER/MANAGER                                                                        | `/shifts/:id/capacities` — số lượng tối đa mỗi vị trí được xếp trong 1 ca                                                                                                             |
+| `work-schedule`           | OWNER/MANAGER, STAFF: xem lịch của chính mình                                        | `/employees/:id/work-schedule` (xếp lịch, hỗ trợ bulk theo nhiều ngày) + `/work-schedule` (tab tổng hợp); chặn vượt `shift-position-capacity`, idempotent khi xếp trùng ngày/ca đã có |
+| `attendance`              | OWNER/MANAGER: xem tất cả; STAFF: tự check-in/check-out + xem lịch sử của chính mình | Check-in yêu cầu có `work-schedule` khớp ngày/ca; check-out tính lương ngay trong 1 transaction                                                                                       |
+| `daily-payment`           | OWNER/MANAGER: xem tất cả; STAFF: xem lương của chính mình                           | `/employees/:id/daily-payment` + `/daily-payment` (tổng hợp toàn nhà hàng theo tháng) — sinh tự động khi check-out, không có API tạo/sửa tay                                          |
 
 `position-history`/`employment-period` chỉ đọc (`GET`), được ghi tự động bởi vòng đời `employee` (create/đổi vị trí/resign/rehire). Không lưu counter "số ngày" — chỉ lưu `startDate`/`endDate` (`endDate = null` nghĩa là đang mở), số ngày luôn tính lúc đọc API bằng `(endDate ?? hiện tại) - startDate`. Vì vậy `Position` bị chặn xóa (409) nếu đã từng xuất hiện trong `position-history`, kể cả khi hiện không còn ai giữ. Tương tự, `Employee` bị chặn xóa (409) nếu đã từng có `attendance`.
 
