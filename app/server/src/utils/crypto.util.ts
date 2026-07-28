@@ -7,6 +7,8 @@ const AUTH_TAG_LENGTH = 16;
 
 const key = crypto.createHash('sha256').update(env.SECRET_KEY).digest();
 
+// Hàm encrypt được sử dụng để mã hóa một chuỗi văn bản (plainText) bằng thuật toán AES-256-GCM. Nó tạo ra một vector khởi tạo (IV) ngẫu nhiên, mã hóa văn bản và trả về kết quả dưới dạng chuỗi base64, bao gồm IV, tag xác thực và dữ liệu đã mã hóa.
+
 export function encrypt(plainText: string): string {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
@@ -15,6 +17,8 @@ export function encrypt(plainText: string): string {
 
   return Buffer.concat([iv, authTag, encrypted]).toString('base64');
 }
+
+// Hàm decrypt được sử dụng để giải mã một chuỗi văn bản đã được mã hóa (cipherText) bằng thuật toán AES-256-GCM. Nó tách IV, tag xác thực và dữ liệu đã mã hóa từ chuỗi base64, sau đó giải mã dữ liệu và trả về kết quả dưới dạng chuỗi văn bản gốc.
 
 export function decrypt(cipherText: string): string {
   const buffer = Buffer.from(cipherText, 'base64');

@@ -3,6 +3,8 @@ import { env } from './config/env.js';
 import { redisClient } from './config/redis.js';
 import { prisma } from './config/prisma.js';
 
+// Khởi tạo và chạy server Express
+
 async function bootstrap() {
   try {
     await redisClient.connect();

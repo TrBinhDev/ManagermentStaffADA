@@ -5,6 +5,8 @@ import { UnauthorizedError } from "../errors/AppError.js";
 import { Message } from "../constants/message.js";
 import { env } from "../config/env.js";
 
+// Middleware authenticate được sử dụng để xác thực người dùng dựa trên JWT (JSON Web Token). Nó kiểm tra xem token có hợp lệ hay không và nếu hợp lệ, nó sẽ giải mã token và gán thông tin người dùng vào req.user để các middleware hoặc route handler tiếp theo có thể sử dụng.
+
 export interface JwtPayload {
   managerAccountId: string;
   role: ManagerRole;

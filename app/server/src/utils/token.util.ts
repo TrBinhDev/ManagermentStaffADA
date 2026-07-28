@@ -6,6 +6,8 @@ import { Message } from '../constants/message.js';
 import { UnauthorizedError } from '../errors/AppError.js';
 import type { JwtPayload } from '../middlewares/authenticate.middleware.js';
 
+// File này chứa các hàm tiện ích liên quan đến việc tạo và xác minh token JWT. Nó sử dụng thư viện jsonwebtoken để thực hiện các thao tác này. Các hàm chính bao gồm signAccessToken, signRefreshToken và verifyRefreshToken.
+
 export interface RefreshTokenPayload {
   managerAccountId: string;
   role: ManagerRole;

@@ -1,3 +1,5 @@
+// File này chứa các hằng số HTTP status code được sử dụng trong ứng dụng. Các hằng số này giúp mã hóa và giải mã các trạng thái HTTP một cách dễ dàng và rõ ràng hơn, giúp cải thiện khả năng đọc và bảo trì mã nguồn.
+
 export const HttpStatus = {
   OK: 200,
   CREATED: 201,

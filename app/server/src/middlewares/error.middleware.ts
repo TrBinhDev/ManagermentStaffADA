@@ -4,6 +4,8 @@ import { AppError } from "../errors/AppError.js";
 import { HttpStatus } from "../constants/httpStatus.js";
 import { Message } from "../constants/message.js";
 
+// Middleware xử lý lỗi trong ứng dụng Express. Nó kiểm tra loại lỗi và trả về phản hồi phù hợp cho client. Nếu lỗi là một AppError, nó sẽ trả về mã trạng thái và thông điệp lỗi tương ứng. Nếu lỗi là một lỗi từ Prisma liên quan đến ràng buộc dữ liệu (P2003), nó sẽ trả về mã trạng thái xung đột (409) với thông điệp thích hợp. Nếu là lỗi không xác định, nó sẽ log lỗi và trả về mã trạng thái 500 với thông điệp lỗi chung.
+
 export function errorHandler(
   err: Error,
   req: Request,

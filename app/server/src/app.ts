@@ -20,6 +20,8 @@ import { attendanceRouter } from './modules/attendance/attendance.routes.js';
 import { dailyPaymentRouter, dailyPaymentSummaryRouter } from './modules/daily-payment/daily-payment.routes.js';
 import { meRouter } from './modules/me/me.routes.js';
 
+// Khởi tạo các router cho các module khác nhau trong ứng dụng. Mỗi router sẽ xử lý các yêu cầu liên quan đến một phần cụ thể của hệ thống, ví dụ như xác thực người dùng, quản lý phòng ban, vị trí công việc, nhân viên, lịch làm việc, chấm công, thanh toán hàng ngày, v.v. Các router này được import từ các file tương ứng trong thư mục modules.
+
 export const app = express();
 
 app.use(cors({ origin: env.CLIENT_ORIGIN, credentials: true }));

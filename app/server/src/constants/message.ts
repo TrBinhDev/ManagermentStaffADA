@@ -1,3 +1,5 @@
+// File này chứa các thông điệp lỗi và thông báo được sử dụng trong toàn bộ ứng dụng. Việc sử dụng một tệp hằng số riêng biệt giúp quản lý và duy trì các thông điệp dễ dàng hơn, đồng thời đảm bảo tính nhất quán trong việc hiển thị thông báo cho người dùng.
+
 export const Message = {
   COMMON: {
     SERVER_ERROR: "Đã có lỗi xảy ra, vui lòng thử lại sau",
