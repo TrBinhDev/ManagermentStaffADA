@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+﻿// Module: shift\r\n// Mô tả: Xử lý request/response cho các endpoint của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { HttpStatus } from '../../constants/httpStatus.js';
 import * as shiftService from './shift.service.js';
@@ -31,3 +31,4 @@ export const remove = asyncHandler(async (req: Request, res: Response) => {
   await shiftService.remove(req.params.id as string);
   res.status(HttpStatus.NO_CONTENT).send();
 });
+

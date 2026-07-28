@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: shift-position-capacity\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -17,3 +17,4 @@ shiftPositionCapacityRouter.patch(
   capacityController.update,
 );
 shiftPositionCapacityRouter.delete('/:id/capacities/:capacityId', capacityController.remove);
+

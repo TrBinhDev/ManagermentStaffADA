@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: employee-profile\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 import type { UpsertEmployeeProfileInput } from './employee-profile.schema.js';
 
 type ProfileFields = Omit<UpsertEmployeeProfileInput, 'cccd'>;
@@ -26,3 +26,4 @@ export function create(employeeId: string, cccdEncrypted: string, data: ProfileF
 export function update(employeeId: string, data: ProfileFields & { cccdEncrypted?: string }) {
   return prisma.employeeProfile.update({ where: { employeeId }, data });
 }
+

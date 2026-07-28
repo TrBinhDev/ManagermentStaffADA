@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: department\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { NotFoundError, ConflictError } from '../../errors/AppError.js';
 import * as departmentRepository from './department.repository.js';
 import type { ListDepartmentQuery, CreateDepartmentInput, UpdateDepartmentInput } from './department.schema.js';
@@ -59,3 +59,4 @@ export async function remove(id: string): Promise<void> {
 
   await departmentRepository.remove(id);
 }
+

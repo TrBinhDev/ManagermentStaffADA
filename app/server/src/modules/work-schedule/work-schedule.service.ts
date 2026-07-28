@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: work-schedule\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { BadRequestError, NotFoundError } from '../../errors/AppError.js';
 import { monthRangeUTC, parseDateOnly } from '../../utils/date.util.js';
 import { findExistingAttendance } from '../attendance/attendance.repository.js';
@@ -113,3 +113,4 @@ export async function remove(scheduleId: string, employeeId: string): Promise<vo
 
   await workScheduleRepository.remove(scheduleId);
 }
+

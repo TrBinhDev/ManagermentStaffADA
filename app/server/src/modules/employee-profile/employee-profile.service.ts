@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: employee-profile\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { BadRequestError, NotFoundError, ConflictError } from '../../errors/AppError.js';
 import { hashCccd } from '../../utils/hash.util.js';
 import { encrypt, decrypt } from '../../utils/crypto.util.js';
@@ -63,3 +63,4 @@ export async function upsertProfile(employeeId: string, input: UpsertEmployeePro
 
   return getProfile(employeeId);
 }
+

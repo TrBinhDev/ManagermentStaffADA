@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: manager-account\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -24,3 +24,4 @@ managerAccountRouter.patch(
   managerAccountController.resetPassword,
 );
 managerAccountRouter.delete('/:id', managerAccountController.remove);
+

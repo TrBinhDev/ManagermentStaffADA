@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: department\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -14,3 +14,4 @@ departmentRouter.get('/:id', departmentController.getById);
 departmentRouter.post('/', validate(createDepartmentSchema), departmentController.create);
 departmentRouter.patch('/:id', validate(updateDepartmentSchema), departmentController.update);
 departmentRouter.delete('/:id', departmentController.remove);
+

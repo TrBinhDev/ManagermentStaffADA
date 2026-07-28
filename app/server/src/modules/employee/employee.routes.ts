@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: employee\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -21,3 +21,4 @@ employeeRouter.patch('/:id', validate(updateEmployeeSchema), employeeController.
 employeeRouter.delete('/:id', employeeController.remove);
 employeeRouter.patch('/:id/resign', employeeController.resign);
 employeeRouter.patch('/:id/rehire', validate(rehireEmployeeSchema), employeeController.rehire);
+

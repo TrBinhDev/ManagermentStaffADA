@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: daily-payment\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 
 export function findEmployeeById(employeeId: string) {
   return prisma.employee.findUnique({ where: { id: employeeId } });
@@ -19,3 +19,4 @@ export function findAllByRange(start: Date, end: Date, employeeId: string | unde
     include: { employee: { select: { id: true, code: true, fullName: true } } },
   });
 }
+

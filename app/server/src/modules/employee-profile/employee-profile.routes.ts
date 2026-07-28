@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: employee-profile\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -15,3 +15,4 @@ employeeProfileRouter.put(
   validate(upsertEmployeeProfileSchema),
   employeeProfileController.upsertProfile,
 );
+

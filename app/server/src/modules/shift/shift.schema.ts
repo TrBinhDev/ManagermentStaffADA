@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿// Module: shift\r\n// Mô tả: Định nghĩa và validate dữ liệu (zod) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { z } from 'zod';
 
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -13,16 +13,17 @@ export const listShiftQuerySchema = z.object({
 export type ListShiftQuery = z.infer<typeof listShiftQuerySchema>;
 
 export const createShiftSchema = z.object({
-  name: z.string().trim().min(1, 'Tên ca làm việc không được để trống'),
-  startTime: z.string().regex(TIME_REGEX, 'Giờ bắt đầu không hợp lệ (định dạng HH:MM)'),
-  endTime: z.string().regex(TIME_REGEX, 'Giờ kết thúc không hợp lệ (định dạng HH:MM)'),
+  name: z.string().trim().min(1, 'TÃªn ca lÃ m viá»‡c khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
+  startTime: z.string().regex(TIME_REGEX, 'Giá» báº¯t Ä‘áº§u khÃ´ng há»£p lá»‡ (Ä‘á»‹nh dáº¡ng HH:MM)'),
+  endTime: z.string().regex(TIME_REGEX, 'Giá» káº¿t thÃºc khÃ´ng há»£p lá»‡ (Ä‘á»‹nh dáº¡ng HH:MM)'),
 });
 export type CreateShiftInput = z.infer<typeof createShiftSchema>;
 
 export const updateShiftSchema = z.object({
-  name: z.string().trim().min(1, 'Tên ca làm việc không được để trống').optional(),
-  startTime: z.string().regex(TIME_REGEX, 'Giờ bắt đầu không hợp lệ (định dạng HH:MM)').optional(),
-  endTime: z.string().regex(TIME_REGEX, 'Giờ kết thúc không hợp lệ (định dạng HH:MM)').optional(),
+  name: z.string().trim().min(1, 'TÃªn ca lÃ m viá»‡c khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng').optional(),
+  startTime: z.string().regex(TIME_REGEX, 'Giá» báº¯t Ä‘áº§u khÃ´ng há»£p lá»‡ (Ä‘á»‹nh dáº¡ng HH:MM)').optional(),
+  endTime: z.string().regex(TIME_REGEX, 'Giá» káº¿t thÃºc khÃ´ng há»£p lá»‡ (Ä‘á»‹nh dáº¡ng HH:MM)').optional(),
   isActive: z.boolean().optional(),
 });
 export type UpdateShiftInput = z.infer<typeof updateShiftSchema>;
+

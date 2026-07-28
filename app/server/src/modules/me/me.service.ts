@@ -1,4 +1,4 @@
-import * as workScheduleService from '../work-schedule/work-schedule.service.js';
+﻿// Module: me\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport * as workScheduleService from '../work-schedule/work-schedule.service.js';
 import type { ListEmployeeWorkScheduleQuery } from '../work-schedule/work-schedule.schema.js';
 import * as attendanceService from '../attendance/attendance.service.js';
 import * as dailyPaymentService from '../daily-payment/daily-payment.service.js';
@@ -26,3 +26,4 @@ export function getProfile(employeeId: string) {
 export function updateProfile(employeeId: string, input: MeUpdateProfileInput) {
   return employeeProfileService.upsertProfile(employeeId, input);
 }
+

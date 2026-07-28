@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: position\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { BadRequestError, NotFoundError, ConflictError } from '../../errors/AppError.js';
 import * as positionRepository from './position.repository.js';
 import type { ListPositionQuery, CreatePositionInput, UpdatePositionInput } from './position.schema.js';
@@ -79,3 +79,4 @@ export async function remove(id: string): Promise<void> {
 
   await positionRepository.remove(id);
 }
+

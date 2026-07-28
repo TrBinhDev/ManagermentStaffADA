@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿// Module: position\r\n// Mô tả: Định nghĩa và validate dữ liệu (zod) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { z } from 'zod';
 
 export const listPositionQuerySchema = z.object({
   departmentId: z.string().optional(),
@@ -13,14 +13,15 @@ export const listPositionQuerySchema = z.object({
 export type ListPositionQuery = z.infer<typeof listPositionQuerySchema>;
 
 export const createPositionSchema = z.object({
-  name: z.string().trim().min(1, 'Tên vị trí không được để trống'),
-  departmentId: z.string().min(1, 'departmentId không được để trống'),
+  name: z.string().trim().min(1, 'TÃªn vá»‹ trÃ­ khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
+  departmentId: z.string().min(1, 'departmentId khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
 });
 export type CreatePositionInput = z.infer<typeof createPositionSchema>;
 
 export const updatePositionSchema = z.object({
-  name: z.string().trim().min(1, 'Tên vị trí không được để trống').optional(),
+  name: z.string().trim().min(1, 'TÃªn vá»‹ trÃ­ khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng').optional(),
   departmentId: z.string().min(1).optional(),
   isActive: z.boolean().optional(),
 });
 export type UpdatePositionInput = z.infer<typeof updatePositionSchema>;
+

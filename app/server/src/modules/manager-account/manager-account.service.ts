@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+﻿// Module: manager-account\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport bcrypt from "bcrypt";
 import { Message } from "../../constants/message.js";
 import {
   BadRequestError,
@@ -208,3 +208,4 @@ export async function remove(id: string): Promise<void> {
   await managerAccountRepository.remove(id);
   await deleteSession(id);
 }
+

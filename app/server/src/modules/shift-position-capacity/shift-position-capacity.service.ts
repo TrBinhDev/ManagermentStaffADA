@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: shift-position-capacity\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { NotFoundError, ConflictError } from '../../errors/AppError.js';
 import * as capacityRepository from './shift-position-capacity.repository.js';
 import type { CreateCapacityInput, UpdateCapacityInput } from './shift-position-capacity.schema.js';
@@ -52,3 +52,4 @@ export async function remove(shiftId: string, capacityId: string): Promise<void>
 
   await capacityRepository.remove(capacityId);
 }
+

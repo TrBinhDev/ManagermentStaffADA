@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: shift\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 
 function buildWhere(isActive: boolean | undefined) {
   return isActive !== undefined ? { isActive } : {};
@@ -38,3 +38,4 @@ export function countWorkSchedule(shiftId: string) {
 export function remove(id: string) {
   return prisma.shift.delete({ where: { id } });
 }
+

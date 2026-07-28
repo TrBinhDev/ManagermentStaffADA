@@ -1,4 +1,4 @@
-import type { EmployeeStatus, Prisma } from '@prisma/client';
+﻿// Module: employee\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { EmployeeStatus, Prisma } from '@prisma/client';
 import { prisma } from '../../config/prisma.js';
 
 const positionSelect = {
@@ -120,3 +120,4 @@ export function closeOpenEmploymentPeriod(employeeId: string) {
     data: { endDate: new Date() },
   });
 }
+

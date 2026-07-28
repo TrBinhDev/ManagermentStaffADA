@@ -1,4 +1,4 @@
-import type { ManagerRole } from '@prisma/client';
+﻿// Module: manager-account\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { ManagerRole } from '@prisma/client';
 import { prisma } from '../../config/prisma.js';
 
 const accountSelect = {
@@ -70,3 +70,4 @@ export function updatePasswordHash(id: string, passwordHash: string) {
 export function remove(id: string) {
   return prisma.managerAccount.delete({ where: { id } });
 }
+

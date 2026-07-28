@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿// Module: daily-payment\r\n// Mô tả: Định nghĩa và validate dữ liệu (zod) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { z } from 'zod';
 
 export const listEmployeePaymentsQuerySchema = z.object({
   month: z.coerce.number().int().min(1).max(12),
@@ -12,3 +12,4 @@ export const listAllPaymentsQuerySchema = z.object({
   employeeId: z.string().optional(),
 });
 export type ListAllPaymentsQuery = z.infer<typeof listAllPaymentsQuerySchema>;
+

@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+﻿// Module: employee\r\n// Mô tả: Xử lý request/response cho các endpoint của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { HttpStatus } from '../../constants/httpStatus.js';
 import * as employeeService from './employee.service.js';
@@ -47,3 +47,4 @@ export const rehire = asyncHandler(async (req: Request, res: Response) => {
   const employee = await employeeService.rehire(req.params.id as string, body);
   res.status(HttpStatus.OK).json(employee);
 });
+

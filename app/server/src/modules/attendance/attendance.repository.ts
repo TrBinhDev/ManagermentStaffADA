@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client';
+﻿// Module: attendance\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { Prisma } from '@prisma/client';
 import { prisma } from '../../config/prisma.js';
 
 const summarySelect = {
@@ -130,3 +130,4 @@ export function findMany(filters: AttendanceFilters, skip: number, take: number)
 export function count(filters: AttendanceFilters) {
   return prisma.attendance.count({ where: buildWhere(filters) });
 }
+

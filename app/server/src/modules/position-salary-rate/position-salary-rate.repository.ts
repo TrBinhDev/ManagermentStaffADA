@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: position-salary-rate\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 
 export function findPositionById(positionId: string) {
   return prisma.position.findUnique({ where: { id: positionId } });
@@ -31,3 +31,4 @@ export function createRate(positionId: string, hourlyRate: number, openRateId: s
     });
   });
 }
+

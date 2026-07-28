@@ -1,4 +1,4 @@
-import { z } from "zod";
+﻿// Module: manager-account\r\n// Mô tả: Định nghĩa và validate dữ liệu (zod) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { z } from "zod";
 import { Message } from "../../constants/message.js";
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
@@ -18,13 +18,13 @@ export type ListManagerAccountQuery = z.infer<
 
 export const createManagerAccountSchema = z
   .object({
-    email: z.string().email("Email không hợp lệ"),
+    email: z.string().email("Email khÃ´ng há»£p lá»‡"),
     password: z.string().regex(PASSWORD_REGEX, Message.AUTH.WEAK_PASSWORD),
     role: z.enum(["MANAGER", "STAFF"]),
     employeeId: z.string().min(1).optional(),
   })
   .refine((data) => data.role !== 'STAFF' || !!data.employeeId, {
-    message: 'Tài khoản STAFF bắt buộc phải gắn với 1 nhân viên',
+    message: 'TÃ i khoáº£n STAFF báº¯t buá»™c pháº£i gáº¯n vá»›i 1 nhÃ¢n viÃªn',
     path: ['employeeId'],
   });
 export type CreateManagerAccountInput = z.infer<
@@ -33,7 +33,7 @@ export type CreateManagerAccountInput = z.infer<
 
 export const updateManagerAccountSchema = z.object({
   isActive: z.boolean().optional(),
-  email: z.string().email("Email không hợp lệ").optional(),
+  email: z.string().email("Email khÃ´ng há»£p lá»‡").optional(),
   role: z.enum(["MANAGER", "STAFF"]).optional(),
   employeeId: z.string().min(1).nullable().optional(),
 });
@@ -45,3 +45,4 @@ export const resetPasswordSchema = z.object({
   newPassword: z.string().regex(PASSWORD_REGEX, Message.AUTH.WEAK_PASSWORD),
 });
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+

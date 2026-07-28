@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+﻿// Module: employee-profile\r\n// Mô tả: Xử lý request/response cho các endpoint của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { HttpStatus } from '../../constants/httpStatus.js';
 import * as employeeProfileService from './employee-profile.service.js';
@@ -14,3 +14,4 @@ export const upsertProfile = asyncHandler(async (req: Request, res: Response) =>
   const profile = await employeeProfileService.upsertProfile(req.params.id as string, body);
   res.status(HttpStatus.OK).json(profile);
 });
+

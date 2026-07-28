@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: shift-position-capacity\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 
 const positionSelect = {
   position: { select: { id: true, name: true, department: { select: { name: true } } } },
@@ -48,3 +48,4 @@ export function update(id: string, maxStaff: number) {
 export function remove(id: string) {
   return prisma.shiftPositionCapacity.delete({ where: { id } });
 }
+

@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+﻿// Module: daily-payment\r\n// Mô tả: Xử lý request/response cho các endpoint của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { HttpStatus } from '../../constants/httpStatus.js';
 import * as dailyPaymentService from './daily-payment.service.js';
@@ -15,3 +15,4 @@ export const listAll = asyncHandler(async (req: Request, res: Response) => {
   const result = await dailyPaymentService.listAll(query);
   res.status(HttpStatus.OK).json(result);
 });
+

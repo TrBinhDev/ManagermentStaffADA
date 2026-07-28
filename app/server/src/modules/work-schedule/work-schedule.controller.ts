@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+﻿// Module: work-schedule\r\n// Mô tả: Xử lý request/response cho các endpoint của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport type { Request, Response } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { HttpStatus } from '../../constants/httpStatus.js';
 import * as workScheduleService from './work-schedule.service.js';
@@ -41,3 +41,4 @@ export const listAll = asyncHandler(async (req: Request, res: Response) => {
   const result = await workScheduleService.listAll(query);
   res.status(HttpStatus.OK).json(result);
 });
+

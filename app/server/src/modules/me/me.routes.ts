@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: me\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -20,3 +20,4 @@ meRouter.get('/attendance', validate(meAttendanceQuerySchema, 'query'), meContro
 meRouter.get('/payments', validate(listEmployeePaymentsQuerySchema, 'query'), meController.listPayments);
 meRouter.get('/profile', meController.getProfile);
 meRouter.patch('/profile', validate(meUpdateProfileSchema), meController.updateProfile);
+

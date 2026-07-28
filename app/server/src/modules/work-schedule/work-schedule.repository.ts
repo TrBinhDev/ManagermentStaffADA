@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: work-schedule\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 
 const shiftSelect = { shift: { select: { id: true, name: true, startTime: true, endTime: true } } } as const;
 const employeeSelect = { employee: { select: { id: true, code: true, fullName: true } } } as const;
@@ -70,3 +70,4 @@ export function updateShift(id: string, shiftId: string) {
 export function remove(id: string) {
   return prisma.workSchedule.delete({ where: { id } });
 }
+

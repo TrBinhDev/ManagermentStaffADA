@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: daily-payment\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { NotFoundError } from '../../errors/AppError.js';
 import { monthRangeUTC } from '../../utils/date.util.js';
 import * as dailyPaymentRepository from './daily-payment.repository.js';
@@ -47,3 +47,4 @@ export async function listAll({ month, year, employeeId }: ListAllPaymentsQuery)
 
   return { data, grandTotal };
 }
+

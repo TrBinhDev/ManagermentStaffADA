@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+﻿// Module: attendance\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Prisma } from '@prisma/client';
 import { Message } from '../../constants/message.js';
 import { BadRequestError, NotFoundError, ConflictError } from '../../errors/AppError.js';
 import { parseDateOnly, combineDateAndTime } from '../../utils/date.util.js';
@@ -101,3 +101,4 @@ export async function list({ employeeId, from, to, page, limit }: ListAttendance
 
   return { data, total, page, limit };
 }
+

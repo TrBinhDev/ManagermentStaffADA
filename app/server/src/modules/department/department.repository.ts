@@ -1,4 +1,4 @@
-import { prisma } from '../../config/prisma.js';
+﻿// Module: department\r\n// Mô tả: Thao tác cơ sở dữ liệu (Prisma) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { prisma } from '../../config/prisma.js';
 
 function buildWhere(search?: string) {
   return search ? { name: { contains: search, mode: 'insensitive' as const } } : {};
@@ -35,3 +35,4 @@ export function countPositions(departmentId: string) {
 export function remove(id: string) {
   return prisma.department.delete({ where: { id } });
 }
+

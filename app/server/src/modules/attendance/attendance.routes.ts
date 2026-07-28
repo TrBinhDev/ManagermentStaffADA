@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: attendance\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -12,3 +12,4 @@ attendanceRouter.use(authenticate, authorize('OWNER', 'MANAGER'));
 attendanceRouter.get('/', validate(listAttendanceQuerySchema, 'query'), attendanceController.list);
 attendanceRouter.post('/check-in', validate(checkInSchema), attendanceController.checkIn);
 attendanceRouter.patch('/:id/check-out', attendanceController.checkOut);
+

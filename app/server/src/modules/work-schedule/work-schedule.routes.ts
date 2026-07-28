@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: work-schedule\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -40,3 +40,4 @@ workScheduleSummaryRouter.get(
   validate(listAllWorkScheduleQuerySchema, 'query'),
   workScheduleController.listAll,
 );
+

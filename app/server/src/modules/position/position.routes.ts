@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: position\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -14,3 +14,4 @@ positionRouter.get('/:id', positionController.getById);
 positionRouter.post('/', validate(createPositionSchema), positionController.create);
 positionRouter.patch('/:id', validate(updatePositionSchema), positionController.update);
 positionRouter.delete('/:id', positionController.remove);
+

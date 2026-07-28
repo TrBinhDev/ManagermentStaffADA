@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿// Module: work-schedule\r\n// Mô tả: Định nghĩa và validate dữ liệu (zod) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { z } from 'zod';
 
 const DATE_ONLY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -16,14 +16,15 @@ export const listAllWorkScheduleQuerySchema = z.object({
 export type ListAllWorkScheduleQuery = z.infer<typeof listAllWorkScheduleQuerySchema>;
 
 export const bulkCreateWorkScheduleSchema = z.object({
-  shiftId: z.string().min(1, 'shiftId không được để trống'),
+  shiftId: z.string().min(1, 'shiftId khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
   workDates: z
-    .array(z.string().regex(DATE_ONLY_REGEX, 'Ngày không hợp lệ (định dạng YYYY-MM-DD)'))
-    .min(1, 'Cần chọn ít nhất 1 ngày'),
+    .array(z.string().regex(DATE_ONLY_REGEX, 'NgÃ y khÃ´ng há»£p lá»‡ (Ä‘á»‹nh dáº¡ng YYYY-MM-DD)'))
+    .min(1, 'Cáº§n chá»n Ã­t nháº¥t 1 ngÃ y'),
 });
 export type BulkCreateWorkScheduleInput = z.infer<typeof bulkCreateWorkScheduleSchema>;
 
 export const updateWorkScheduleSchema = z.object({
-  shiftId: z.string().min(1, 'shiftId không được để trống'),
+  shiftId: z.string().min(1, 'shiftId khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
 });
 export type UpdateWorkScheduleInput = z.infer<typeof updateWorkScheduleSchema>;
+

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+﻿// Module: shift\r\n// Mô tả: Định nghĩa các đường dẫn (endpoints) và middleware liên quan (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Router } from 'express';
 import { authenticate } from '../../middlewares/authenticate.middleware.js';
 import { authorize } from '../../middlewares/authorize.middleware.js';
 import { validate } from '../../validators/validate.js';
@@ -14,3 +14,4 @@ shiftRouter.get('/:id', shiftController.getById);
 shiftRouter.post('/', validate(createShiftSchema), shiftController.create);
 shiftRouter.patch('/:id', validate(updateShiftSchema), shiftController.update);
 shiftRouter.delete('/:id', shiftController.remove);
+

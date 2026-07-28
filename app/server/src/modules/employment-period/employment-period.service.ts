@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: employment-period\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { NotFoundError } from '../../errors/AppError.js';
 import { daysBetween } from '../../utils/date.util.js';
 import * as employmentPeriodRepository from './employment-period.repository.js';
@@ -18,3 +18,4 @@ export async function getTimeline(employeeId: string) {
     days: daysBetween(row.startDate, row.endDate ?? new Date()),
   }));
 }
+

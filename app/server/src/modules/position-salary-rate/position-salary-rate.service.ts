@@ -1,4 +1,4 @@
-import { Message } from '../../constants/message.js';
+﻿// Module: position-salary-rate\r\n// Mô tả: Logic nghiệp vụ chính của module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { Message } from '../../constants/message.js';
 import { NotFoundError } from '../../errors/AppError.js';
 import { startOfToday } from '../../utils/date.util.js';
 import * as positionSalaryRateRepository from './position-salary-rate.repository.js';
@@ -24,3 +24,4 @@ export async function create(positionId: string, { hourlyRate }: CreateSalaryRat
 
   return positionSalaryRateRepository.createRate(positionId, hourlyRate, openRate?.id, effectiveDate);
 }
+

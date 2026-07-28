@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿// Module: employee\r\n// Mô tả: Định nghĩa và validate dữ liệu (zod) cho module (chú thích ngắn gọn bằng tiếng Việt)\r\nimport { z } from 'zod';
 
 export const listEmployeeQuerySchema = z.object({
   status: z.enum(['ACTIVE', 'RESIGNED']).optional(),
@@ -11,15 +11,15 @@ export const listEmployeeQuerySchema = z.object({
 export type ListEmployeeQuery = z.infer<typeof listEmployeeQuerySchema>;
 
 export const createEmployeeSchema = z.object({
-  cccd: z.string().regex(/^\d{12}$/, 'CCCD phải gồm đúng 12 chữ số'),
-  fullName: z.string().trim().min(1, 'Họ tên không được để trống'),
+  cccd: z.string().regex(/^\d{12}$/, 'CCCD pháº£i gá»“m Ä‘Ãºng 12 chá»¯ sá»‘'),
+  fullName: z.string().trim().min(1, 'Há» tÃªn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
   dob: z.coerce.date().optional(),
-  positionId: z.string().min(1, 'positionId không được để trống'),
+  positionId: z.string().min(1, 'positionId khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng'),
 });
 export type CreateEmployeeInput = z.infer<typeof createEmployeeSchema>;
 
 export const updateEmployeeSchema = z.object({
-  fullName: z.string().trim().min(1, 'Họ tên không được để trống').optional(),
+  fullName: z.string().trim().min(1, 'Há» tÃªn khÃ´ng Ä‘Æ°á»£c Ä‘á»ƒ trá»‘ng').optional(),
   dob: z.coerce.date().optional(),
   positionId: z.string().min(1).optional(),
 });
@@ -29,3 +29,4 @@ export const rehireEmployeeSchema = z.object({
   positionId: z.string().min(1).optional(),
 });
 export type RehireEmployeeInput = z.infer<typeof rehireEmployeeSchema>;
+
