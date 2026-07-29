@@ -12,6 +12,7 @@ import type { CheckInInput, ListAttendanceQuery } from "./attendance.schema.js";
 const MS_PER_HOUR = 60 * 60 * 1000; // Số mili-giây trong 1 giờ, dùng để tính số giờ làm
 const AMOUNT_ROUND_UNIT = 1000; // Đơn vị làm tròn tiền lương (làm tròn đến hàng nghìn)
 const EARLY_CHECKIN_GRACE_MS = 5 * 60 * 1000; // Cho phép check-in sớm tối đa 5 phút trước giờ ca
+const LATE_CHECKIN_GRACE_MS = 15 * 60 * 1000; // Cho phép check-in trễ tối đa 15p sau khi ca kết thúc
 
 // Hàm xử lý check-in cho nhân viên
 export async function checkIn(
@@ -63,6 +64,12 @@ export async function checkIn(
   // Không cho check-in quá sớm (trước giờ ca trừ đi thời gian ân hạn)
   if (Date.now() < shiftStartAt.getTime() - EARLY_CHECKIN_GRACE_MS) {
     throw new BadRequestError(Message.ATTENDANCE.TOO_EARLY, "TOO_EARLY");
+  }
+
+  // Chặn check-in trễ: qua giờ kết thúc ca (+ thời gian ân hạn) thì không cho check-in nữa
+  const shiftEndAt = combineDateAndTime(workDate, shift.endTime);
+  if (Date.now() > shiftEndAt.getTime() + LATE_CHECKIN_GRACE_MS) {
+    throw new BadRequestError(Message.ATTENDANCE.TOO_LATE, "TOO_LATE");
   }
 
   // Kiểm tra đã check-in ca này trong ngày này chưa (tránh check-in trùng)

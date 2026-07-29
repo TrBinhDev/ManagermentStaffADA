@@ -87,6 +87,7 @@ export const Message = {
     NO_SALARY_RATE:
       "Vị trí chưa có mức lương được thiết lập, không thể tính lương. Vui lòng đặt mức lương trước khi chấm công ra",
     TOO_EARLY: "Chưa tới giờ chấm công, được phép chấm công trước giờ vào ca tối đa 5 phút",
+    TOO_LATE: 'Đã quá thời gian cho phép check-in cho ca này',
   },
 
   DAILY_PAYMENT: {

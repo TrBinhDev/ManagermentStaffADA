@@ -26,8 +26,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 const TABS = [
@@ -42,7 +55,11 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
-export default function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function EmployeeDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = use(params);
   const [tab, setTab] = useState<TabKey>("info");
 
@@ -106,7 +123,8 @@ function InfoTab({ employeeId }: { employeeId: string }) {
     refetch();
   }, [refetch]);
 
-  if (loading || !employee) return <p className="text-sm text-muted-foreground">Đang tải...</p>;
+  if (loading || !employee)
+    return <p className="text-sm text-muted-foreground">Đang tải...</p>;
 
   return (
     <div className="max-w-md space-y-3 rounded-lg border p-4">
@@ -140,29 +158,29 @@ function InfoTab({ employeeId }: { employeeId: string }) {
       <div className="flex gap-2 pt-2">
         {employee.status === "ACTIVE" ? (
           !isSelf && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              const ok = await confirm({
-                title: "Cho nghỉ việc",
-                description: `Bạn có chắc chắn muốn cho "${employee.fullName}" nghỉ việc không?`,
-                confirmLabel: "Cho nghỉ việc",
-                destructive: true,
-              });
-              if (!ok) return;
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                const ok = await confirm({
+                  title: "Cho nghỉ việc",
+                  description: `Bạn có chắc chắn muốn cho "${employee.fullName}" nghỉ việc không?`,
+                  confirmLabel: "Cho nghỉ việc",
+                  destructive: true,
+                });
+                if (!ok) return;
 
-              try {
-                await employeeApi.resignEmployee(employeeId);
-                toast.success("Đã cho nhân viên nghỉ việc");
-                refetch();
-              } catch (err) {
-                toast.error(getErrorMessage(err));
-              }
-            }}
-          >
-            Cho nghỉ việc
-          </Button>
+                try {
+                  await employeeApi.resignEmployee(employeeId);
+                  toast.success("Đã cho nhân viên nghỉ việc");
+                  refetch();
+                } catch (err) {
+                  toast.error(getErrorMessage(err));
+                }
+              }}
+            >
+              Cho nghỉ việc
+            </Button>
           )
         ) : (
           <Button
@@ -219,7 +237,10 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
     }
   }, [profile]);
 
-  function set<K extends keyof UpsertEmployeeProfileInput>(key: K, value: string) {
+  function set<K extends keyof UpsertEmployeeProfileInput>(
+    key: K,
+    value: string,
+  ) {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -239,9 +260,13 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
     }
   }
 
-  if (loading) return <p className="text-sm text-muted-foreground">Đang tải...</p>;
+  if (loading)
+    return <p className="text-sm text-muted-foreground">Đang tải...</p>;
 
-  const fields: Array<{ key: keyof UpsertEmployeeProfileInput; label: string }> = [
+  const fields: Array<{
+    key: keyof UpsertEmployeeProfileInput;
+    label: string;
+  }> = [
     { key: "cccd", label: "CCCD" },
     { key: "gender", label: "Giới tính" },
     { key: "ethnicity", label: "Dân tộc" },
@@ -290,7 +315,8 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
 function PositionHistoryTab({ employeeId }: { employeeId: string }) {
   const { data, loading } = usePositionHistory(employeeId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Đang tải...</p>;
+  if (loading)
+    return <p className="text-sm text-muted-foreground">Đang tải...</p>;
 
   return (
     <Table>
@@ -306,8 +332,14 @@ function PositionHistoryTab({ employeeId }: { employeeId: string }) {
         {data.map((row) => (
           <TableRow key={row.id}>
             <TableCell>{row.position.name}</TableCell>
-            <TableCell>{new Date(row.startDate).toLocaleDateString("vi-VN")}</TableCell>
-            <TableCell>{row.endDate ? new Date(row.endDate).toLocaleDateString("vi-VN") : "Đang giữ"}</TableCell>
+            <TableCell>
+              {new Date(row.startDate).toLocaleDateString("vi-VN")}
+            </TableCell>
+            <TableCell>
+              {row.endDate
+                ? new Date(row.endDate).toLocaleDateString("vi-VN")
+                : "Đang giữ"}
+            </TableCell>
             <TableCell>{row.days}</TableCell>
           </TableRow>
         ))}
@@ -345,7 +377,11 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
     setSchedule(result);
     // Da co Attendance (tao ra ngay khi check-in) cho dung ca/ngay nay -> khoa sua/go, dong bo
     // voi rang buoc server moi them o work-schedule.service.ts::remove().
-    setAttendedKeys(new Set(attendance.data.map((a) => `${a.shiftId}|${a.workDate.slice(0, 10)}`)));
+    setAttendedKeys(
+      new Set(
+        attendance.data.map((a) => `${a.shiftId}|${a.workDate.slice(0, 10)}`),
+      ),
+    );
     setLoading(false);
   }, [employeeId, month, year]);
 
@@ -365,7 +401,11 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
   }, [month, year]);
 
   const daysInMonth = new Date(year, month, 0).getDate();
-  const todayDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayDateOnly = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  );
 
   function isPastDay(day: number) {
     return new Date(year, month - 1, day) < todayDateOnly;
@@ -373,7 +413,11 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
 
   function isPastWorkDate(workDate: string) {
     const d = new Date(workDate);
-    const workDateUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    const workDateUTC = Date.UTC(
+      d.getUTCFullYear(),
+      d.getUTCMonth(),
+      d.getUTCDate(),
+    );
     const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
     return workDateUTC < todayUTC;
   }
@@ -401,9 +445,14 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
       const workDates = Array.from(selectedDays)
         .sort((a, b) => a - b)
         .map(formatDate);
-      const result = await workScheduleApi.bulkCreateWorkSchedule(employeeId, { shiftId: bulkShiftId, workDates });
+      const result = await workScheduleApi.bulkCreateWorkSchedule(employeeId, {
+        shiftId: bulkShiftId,
+        workDates,
+      });
       if (result.rejected.length > 0) {
-        toast.error(`Đã xếp ${result.created.length} ngày, ${result.rejected.length} ngày bị từ chối (đã đủ người)`);
+        toast.error(
+          `Đã xếp ${result.created.length} ngày, ${result.rejected.length} ngày bị từ chối (đã đủ người)`,
+        );
       } else {
         toast.success(`Đã xếp ${result.created.length} ngày`);
       }
@@ -416,7 +465,9 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
 
   async function handleChangeShift(scheduleId: string, shiftId: string) {
     try {
-      await workScheduleApi.updateWorkSchedule(employeeId, scheduleId, { shiftId });
+      await workScheduleApi.updateWorkSchedule(employeeId, scheduleId, {
+        shiftId,
+      });
       toast.success("Đã đổi ca");
       await refetch();
     } catch (err) {
@@ -478,7 +529,9 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
         <TableBody>
           {schedule.map((row) => {
             const past = isPastWorkDate(row.workDate);
-            const attended = attendedKeys.has(`${row.shiftId}|${row.workDate.slice(0, 10)}`);
+            const attended = attendedKeys.has(
+              `${row.shiftId}|${row.workDate.slice(0, 10)}`,
+            );
             const locked = past || attended;
             return (
               <TableRow key={row.id} className={cn(locked && "opacity-60")}>
@@ -496,14 +549,24 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
                 <TableCell className="flex gap-2">
                   {locked ? (
                     <span className="text-xs text-muted-foreground">
-                      {attended ? "Đã chấm công, không thể sửa/gỡ" : "Không thể sửa ngày đã qua"}
+                      {attended
+                        ? "Đã chấm công, không thể sửa/gỡ"
+                        : "Không thể sửa ngày đã qua"}
                     </span>
                   ) : (
                     <>
-                      <Select value={row.shiftId} onValueChange={(v) => handleChangeShift(row.id, v as string)}>
+                      <Select
+                        value={row.shiftId}
+                        onValueChange={(v) =>
+                          handleChangeShift(row.id, v as string)
+                        }
+                      >
                         <SelectTrigger className="w-40">
                           <SelectValue>
-                            {(value: string) => shifts.find((s) => s.id === value)?.name ?? "Đổi ca"}
+                            {(value: string) =>
+                              shifts.find((s) => s.id === value)?.name ??
+                              "Đổi ca"
+                            }
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
@@ -514,7 +577,11 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(row.id)}>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDelete(row.id)}
+                      >
                         Gỡ
                       </Button>
                     </>
@@ -528,15 +595,22 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
       {!loading && schedule.length === 0 && (
-        <p className="text-sm text-muted-foreground">Chưa có lịch làm việc tháng này.</p>
+        <p className="text-sm text-muted-foreground">
+          Chưa có lịch làm việc tháng này.
+        </p>
       )}
 
       <div className="space-y-3 rounded-lg border p-4">
         <Label>Xếp lịch mới</Label>
-        <Select value={bulkShiftId} onValueChange={(v) => setBulkShiftId(v as string)}>
+        <Select
+          value={bulkShiftId}
+          onValueChange={(v) => setBulkShiftId(v as string)}
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Chọn ca">
-              {(value: string) => shifts.find((s) => s.id === value)?.name ?? "Chọn ca"}
+              {(value: string) =>
+                shifts.find((s) => s.id === value)?.name ?? "Chọn ca"
+              }
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -575,7 +649,9 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
 
         {bulkError && <p className="text-sm text-destructive">{bulkError}</p>}
 
-        <Button onClick={handleBulkCreate}>Xếp lịch ({selectedDays.size} ngày)</Button>
+        <Button onClick={handleBulkCreate}>
+          Xếp lịch ({selectedDays.size} ngày)
+        </Button>
       </div>
     </div>
   );
@@ -586,7 +662,9 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
-  const [scheduleRows, setScheduleRows] = useState<EmployeeWorkScheduleItem[]>([]);
+  const [scheduleRows, setScheduleRows] = useState<EmployeeWorkScheduleItem[]>(
+    [],
+  );
   const [attendanceRows, setAttendanceRows] = useState<AttendanceItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -611,15 +689,25 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
   }, [refetch]);
 
   function findAttendance(shiftId: string, workDate: string) {
-    return attendanceRows.find((a) => a.shiftId === shiftId && a.workDate.slice(0, 10) === workDate.slice(0, 10));
+    return attendanceRows.find(
+      (a) =>
+        a.shiftId === shiftId &&
+        a.workDate.slice(0, 10) === workDate.slice(0, 10),
+    );
   }
 
   function isFutureDay(workDate: string) {
     const d = new Date(workDate);
-    const workDateUTC = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+    const workDateUTC = Date.UTC(
+      d.getUTCFullYear(),
+      d.getUTCMonth(),
+      d.getUTCDate(),
+    );
     const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
     return workDateUTC > todayUTC;
   }
+
+  const LATE_CHECKIN_GRACE_MS = 15 * 60 * 1000; // Khớp với LATE_CHECKIN_GRACE_MS ở backend
 
   function isTooEarlyToCheckIn(workDate: string, startTime: string) {
     const [year, month, day] = workDate.slice(0, 10).split("-").map(Number);
@@ -628,9 +716,20 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
     return now.getTime() < shiftStartAt.getTime() - 5 * 60 * 1000;
   }
 
+  function isTooLateToCheckIn(workDate: string, endTime: string) {
+    const [year, month, day] = workDate.slice(0, 10).split("-").map(Number);
+    const [hours, minutes] = endTime.split(":").map(Number);
+    const shiftEndAt = new Date(year, month - 1, day, hours, minutes);
+    return now.getTime() > shiftEndAt.getTime() + LATE_CHECKIN_GRACE_MS;
+  }
+
   async function handleCheckIn(shiftId: string, workDate: string) {
     try {
-      await attendanceApi.checkIn({ employeeId, shiftId, workDate: workDate.slice(0, 10) });
+      await attendanceApi.checkIn({
+        employeeId,
+        shiftId,
+        workDate: workDate.slice(0, 10),
+      });
       toast.success("Đã chấm công vào");
       await refetch();
     } catch (err) {
@@ -664,7 +763,12 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
         </div>
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Năm</p>
-          <Input type="number" className="w-24" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+          <Input
+            type="number"
+            className="w-24"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+          />
         </div>
       </div>
 
@@ -682,19 +786,32 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
           {scheduleRows.map((row) => {
             const attendance = findAttendance(row.shiftId, row.workDate);
             const future = isFutureDay(row.workDate);
-            const tooEarly = !future && isTooEarlyToCheckIn(row.workDate, row.shift.startTime);
+            const tooEarly =
+              !future && isTooEarlyToCheckIn(row.workDate, row.shift.startTime);
+            const tooLate =
+              !future && isTooLateToCheckIn(row.workDate, row.shift.endTime);
             return (
               <TableRow key={row.id}>
-                <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
+                <TableCell>
+                  {new Date(row.workDate).toLocaleDateString("vi-VN")}
+                </TableCell>
                 <TableCell>{row.shift.name}</TableCell>
                 <TableCell>
-                  {attendance?.checkedInAt ? new Date(attendance.checkedInAt).toLocaleTimeString("vi-VN") : "—"}
+                  {attendance?.checkedInAt
+                    ? new Date(attendance.checkedInAt).toLocaleTimeString(
+                        "vi-VN",
+                      )
+                    : "—"}
                 </TableCell>
                 <TableCell>
-                  {attendance?.checkedOutAt ? new Date(attendance.checkedOutAt).toLocaleTimeString("vi-VN") : "—"}
+                  {attendance?.checkedOutAt
+                    ? new Date(attendance.checkedOutAt).toLocaleTimeString(
+                        "vi-VN",
+                      )
+                    : "—"}
                 </TableCell>
                 <TableCell>
-                  {!attendance && (
+                  {!attendance && !tooLate && (
                     <Button
                       size="sm"
                       variant="outline"
@@ -711,12 +828,21 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
                       Chấm công vào
                     </Button>
                   )}
+                  {!attendance && tooLate && (
+                    <Badge variant="secondary">Đã quá giờ chấm công</Badge>
+                  )}
                   {attendance && !attendance.checkedOutAt && (
-                    <Button size="sm" variant="outline" onClick={() => handleCheckOut(attendance.id)}>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleCheckOut(attendance.id)}
+                    >
                       Chấm công ra
                     </Button>
                   )}
-                  {attendance?.checkedOutAt && <Badge variant="secondary">Hoàn tất</Badge>}
+                  {attendance?.checkedOutAt && (
+                    <Badge variant="secondary">Hoàn tất</Badge>
+                  )}
                 </TableCell>
               </TableRow>
             );
@@ -726,7 +852,9 @@ function AttendanceTab({ employeeId }: { employeeId: string }) {
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
       {!loading && scheduleRows.length === 0 && (
-        <p className="text-sm text-muted-foreground">Chưa có lịch làm việc tháng này để chấm công.</p>
+        <p className="text-sm text-muted-foreground">
+          Chưa có lịch làm việc tháng này để chấm công.
+        </p>
       )}
     </div>
   );
@@ -743,7 +871,11 @@ function PaymentsTab({ employeeId }: { employeeId: string }) {
 
   const refetch = useCallback(async () => {
     setLoading(true);
-    const result = await dailyPaymentApi.fetchEmployeePayments(employeeId, month, year);
+    const result = await dailyPaymentApi.fetchEmployeePayments(
+      employeeId,
+      month,
+      year,
+    );
     setRows(result.data);
     setTotalAmount(result.totalAmount);
     setTotalHours(result.totalHours);
@@ -771,18 +903,27 @@ function PaymentsTab({ employeeId }: { employeeId: string }) {
         </div>
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Năm</p>
-          <Input type="number" className="w-24" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+          <Input
+            type="number"
+            className="w-24"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+          />
         </div>
       </div>
 
       <div className="flex gap-6 rounded-lg border p-4">
         <div>
           <p className="text-xs text-muted-foreground">Tổng giờ làm</p>
-          <p className="text-lg font-semibold">{totalHours.toLocaleString("vi-VN")}h</p>
+          <p className="text-lg font-semibold">
+            {totalHours.toLocaleString("vi-VN")}h
+          </p>
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Tổng lương</p>
-          <p className="text-lg font-semibold">{totalAmount.toLocaleString("vi-VN")}đ</p>
+          <p className="text-lg font-semibold">
+            {totalAmount.toLocaleString("vi-VN")}đ
+          </p>
         </div>
       </div>
 
@@ -799,11 +940,17 @@ function PaymentsTab({ employeeId }: { employeeId: string }) {
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{new Date(row.workDate).toLocaleDateString("vi-VN")}</TableCell>
+              <TableCell>
+                {new Date(row.workDate).toLocaleDateString("vi-VN")}
+              </TableCell>
               <TableCell>{row.position.name}</TableCell>
               <TableCell>{row.hoursWorked}</TableCell>
-              <TableCell>{Number(row.hourlyRate).toLocaleString("vi-VN")}đ</TableCell>
-              <TableCell>{Number(row.amount).toLocaleString("vi-VN")}đ</TableCell>
+              <TableCell>
+                {Number(row.hourlyRate).toLocaleString("vi-VN")}đ
+              </TableCell>
+              <TableCell>
+                {Number(row.amount).toLocaleString("vi-VN")}đ
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -811,7 +958,9 @@ function PaymentsTab({ employeeId }: { employeeId: string }) {
 
       {loading && <p className="text-sm text-muted-foreground">Đang tải...</p>}
       {!loading && rows.length === 0 && (
-        <p className="text-sm text-muted-foreground">Chưa có dữ liệu lương tháng này.</p>
+        <p className="text-sm text-muted-foreground">
+          Chưa có dữ liệu lương tháng này.
+        </p>
       )}
     </div>
   );
@@ -820,7 +969,8 @@ function PaymentsTab({ employeeId }: { employeeId: string }) {
 function EmploymentPeriodTab({ employeeId }: { employeeId: string }) {
   const { data, loading } = useEmploymentPeriods(employeeId);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Đang tải...</p>;
+  if (loading)
+    return <p className="text-sm text-muted-foreground">Đang tải...</p>;
 
   return (
     <Table>
@@ -834,8 +984,14 @@ function EmploymentPeriodTab({ employeeId }: { employeeId: string }) {
       <TableBody>
         {data.map((row) => (
           <TableRow key={row.id}>
-            <TableCell>{new Date(row.startDate).toLocaleDateString("vi-VN")}</TableCell>
-            <TableCell>{row.endDate ? new Date(row.endDate).toLocaleDateString("vi-VN") : "Đang làm"}</TableCell>
+            <TableCell>
+              {new Date(row.startDate).toLocaleDateString("vi-VN")}
+            </TableCell>
+            <TableCell>
+              {row.endDate
+                ? new Date(row.endDate).toLocaleDateString("vi-VN")
+                : "Đang làm"}
+            </TableCell>
             <TableCell>{row.days}</TableCell>
           </TableRow>
         ))}
