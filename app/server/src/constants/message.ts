@@ -39,6 +39,7 @@ export const Message = {
       "CCCD này đã từng có nhân viên nhưng đã nghỉ việc, vui lòng dùng chức năng rehire",
     ALREADY_RESIGNED: "Nhân viên đã nghỉ việc trước đó",
     NOT_RESIGNED: "Nhân viên chưa nghỉ việc, không thể rehire",
+    HAS_RELATED_DATA: 'Không thể xóa nhân viên đã có dữ liệu chấm công hoặc lương',
   },
 
   EMPLOYEE_PROFILE: {
