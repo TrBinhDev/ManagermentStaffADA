@@ -411,6 +411,18 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
     return new Date(year, month - 1, day) < todayDateOnly;
   }
 
+  const selectableDays = Array.from(
+    { length: daysInMonth },
+    (_, i) => i + 1,
+  ).filter((day) => !isPastDay(day));
+  const allSelected =
+    selectableDays.length > 0 &&
+    selectableDays.every((day) => selectedDays.has(day));
+
+  function handleToggleSelectAll() {
+    setSelectedDays(allSelected ? new Set() : new Set(selectableDays));
+  }
+
   function isPastWorkDate(workDate: string) {
     const d = new Date(workDate);
     const workDateUTC = Date.UTC(
@@ -621,6 +633,21 @@ function WorkScheduleTab({ employeeId }: { employeeId: string }) {
             ))}
           </SelectContent>
         </Select>
+
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-xs text-muted-foreground">
+            Đã chọn {selectedDays.size}/{selectableDays.length} ngày có thể xếp
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={selectableDays.length === 0}
+            onClick={handleToggleSelectAll}
+          >
+            {allSelected ? "Bỏ chọn tất cả" : "Chọn tất cả"}
+          </Button>
+        </div>
 
         <div className="flex flex-wrap gap-1.5">
           {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
