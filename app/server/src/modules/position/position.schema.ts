@@ -15,7 +15,7 @@ export type ListPositionQuery = z.infer<typeof listPositionQuerySchema>; // Type
 
 // Schema validate body khi tạo mới Position (POST /positions)
 export const createPositionSchema = z.object({
-  name: z.string().trim().min(1, "Tên vị trí không được để trống"), // Tên vị trí, bắt buộc
+  name: z.string().trim().min(1, "Tên vị trí không được để trống").max(15, "Tên vị trí không được quá 15 kí tự"), // Tên vị trí, bắt buộc
   departmentId: z.string().min(1, "departmentId không được để trống"), // Vị trí phải thuộc 1 phòng ban
 });
 export type CreatePositionInput = z.infer<typeof createPositionSchema>;

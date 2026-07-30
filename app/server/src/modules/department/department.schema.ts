@@ -10,7 +10,7 @@ export type ListDepartmentQuery = z.infer<typeof listDepartmentQuerySchema>; // 
 
 // Validate dữ liệu tạo mới phòng ban
 export const createDepartmentSchema = z.object({
-  name: z.string().trim().min(1, "Tên phòng ban không được để trống"), // Tên phòng ban, bắt buộc, không được rỗng sau khi cắt khoảng trắng
+  name: z.string().trim().min(1, "Tên phòng ban không được để trống").max(15, "Tên phòng ban không được quá 15 kí tự"), // Tên phòng ban, bắt buộc, không được rỗng sau khi cắt khoảng trắng
 });
 export type CreateDepartmentInput = z.infer<typeof createDepartmentSchema>; // Type suy ra tự động từ schema
 

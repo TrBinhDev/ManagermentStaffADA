@@ -14,7 +14,7 @@ export type ListEmployeeQuery = z.infer<typeof listEmployeeQuerySchema>; // Type
 // Validate dữ liệu tạo mới nhân viên
 export const createEmployeeSchema = z.object({
   cccd: z.string().regex(/^\d{12}$/, "CCCD phải gồm đúng 12 chữ số"), // Số CCCD, bắt buộc đúng 12 chữ số
-  fullName: z.string().trim().min(1, "Họ tên không được để trống"), // Họ tên, bắt buộc
+  fullName: z.string().trim().min(1, "Họ tên không được để trống").max(20, "Tên không được quá 20 ký tự"), // Họ tên, bắt buộc
   dob: z.coerce.date().optional(), // Ngày sinh, không bắt buộc, tự ép kiểu từ string sang Date
   positionId: z.string().min(1, "positionId không được để trống"), // Vị trí công việc ban đầu, bắt buộc
 });

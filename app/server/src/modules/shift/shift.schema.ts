@@ -16,7 +16,7 @@ export type ListShiftQuery = z.infer<typeof listShiftQuerySchema>; // Type suy r
 
 // Validate dữ liệu tạo mới ca làm việc
 export const createShiftSchema = z.object({
-  name: z.string().trim().min(1, "Tên ca làm việc không được để trống"), // Tên ca, bắt buộc
+  name: z.string().trim().min(1, "Tên ca làm việc không được để trống").max(15, "Tên ca làm việc không được quá 15 ký tự"), // Tên ca, bắt buộc
   startTime: z
     .string()
     .regex(TIME_REGEX, "Giờ bắt đầu không hợp lệ (định dạng HH:MM)"), // Giờ bắt đầu, bắt buộc đúng định dạng HH:MM
