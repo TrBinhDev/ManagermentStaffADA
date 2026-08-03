@@ -5,6 +5,42 @@ import * as dailyPaymentApi from "@/features/daily-payment/daily-payment.api";
 import type { PaymentSummaryEntry } from "@/features/daily-payment/daily-payment.types";
 import { Input } from "@/components/ui/input";
 
+// Hook dem so tang dan tu 0 -> target, dung requestAnimationFrame, easeOutCubic cho muot.
+function useCountUp(target: number, duration = 800) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    let raf: number;
+    const start = performance.now();
+    const from = 0;
+
+    function tick(now: number) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.round(from + (target - from) * eased));
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    }
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+
+  return value;
+}
+
+function AnimatedNumber({
+  target,
+  format,
+  className,
+}: {
+  target: number;
+  format: (v: number) => string;
+  className?: string;
+}) {
+  const value = useCountUp(target);
+  return <p className={className}>{format(value)}</p>;
+}
+
 export default function PaymentsPage() {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -46,17 +82,30 @@ export default function PaymentsPage() {
         </div>
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground">Năm</p>
-          <Input type="number" className="w-24" value={year} onChange={(e) => setYear(Number(e.target.value))} />
+          <Input
+            type="number"
+            className="w-24"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+          />
         </div>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
-        <p className="text-sm font-medium text-muted-foreground">Tổng lương toàn nhà hàng</p>
-        <p className="mt-2 text-2xl font-bold">{grandTotal.toLocaleString("vi-VN")}đ</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          Tổng lương toàn nhà hàng
+        </p>
+        <AnimatedNumber
+          target={grandTotal}
+          format={(v) => `${v.toLocaleString("vi-VN")}đ`}
+          className="mt-2 text-2xl font-bold"
+        />
       </div>
 
       {!loading && data.length === 0 && (
-        <p className="text-sm text-muted-foreground">Chưa có ai được trả lương trong tháng này.</p>
+        <p className="text-sm text-muted-foreground">
+          Chưa có ai được trả lương trong tháng này.
+        </p>
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -65,11 +114,22 @@ export default function PaymentsPage() {
             key={row.employeeId}
             className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md"
           >
-            <p className="truncate text-base font-semibold" title={row.fullName}>
+            <p
+              className="truncate text-base font-semibold"
+              title={row.fullName}
+            >
               {row.fullName}
             </p>
-            <p className="text-xs text-muted-foreground">{row.totalHours.toLocaleString("vi-VN")}h công</p>
-            <p className="text-lg font-bold text-primary">{row.totalAmount.toLocaleString("vi-VN")}đ</p>
+            <AnimatedNumber
+              target={row.totalHours}
+              format={(v) => `${v.toLocaleString("vi-VN")}h công`}
+              className="text-xs text-muted-foreground"
+            />
+            <AnimatedNumber
+              target={row.totalAmount}
+              format={(v) => `${v.toLocaleString("vi-VN")}đ`}
+              className="text-lg font-bold text-primary"
+            />
           </div>
         ))}
       </div>

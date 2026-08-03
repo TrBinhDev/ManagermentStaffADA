@@ -3,6 +3,7 @@ import { z } from "zod";
 // Schema validate query khi lấy danh sách Position (GET /positions?...)
 export const listPositionQuerySchema = z.object({
   departmentId: z.string().optional(), // Lọc theo phòng ban (optional)
+  positionId: z.string().optional(), // Lọc theo vị trí (optionnal)
   search: z.string().trim().optional(), // Tìm kiếm theo tên (optional)
   isActive: z
     .enum(["true", "false"]) // Query string chỉ nhận string 'true'/'false'

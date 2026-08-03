@@ -25,6 +25,7 @@ function buildWhere(
 // Lấy danh sách vị trí có phân trang, kèm tên phòng ban
 export function findMany(
   departmentId: string | undefined,
+  positionId: string | undefined,
   search: string | undefined,
   isActive: boolean | undefined,
   skip: number,
@@ -42,6 +43,7 @@ export function findMany(
 // Đếm tổng số vị trí thỏa điều kiện (phục vụ tính tổng số trang)
 export function count(
   departmentId: string | undefined,
+  positionId: string | undefined,
   search: string | undefined,
   isActive: boolean | undefined,
 ) {

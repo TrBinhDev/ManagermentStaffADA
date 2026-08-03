@@ -221,6 +221,8 @@ export default function PositionsPage() {
     null,
   );
   const [filterIsActive, setFilterIsActive] = useState<boolean | null>(null);
+  const [filterSearch, setFilterSearch] = useState(""); // Ô nhập tìm theo tên vị trí (raw input)
+  const [debouncedSearch, setDebouncedSearch] = useState(""); // Giá trị đã debounce, dùng để gọi API
   const [requestedPage, setRequestedPage] = useState(1);
 
   const [editTarget, setEditTarget] = useState<Position | null>(null);
@@ -244,18 +246,33 @@ export default function PositionsPage() {
   }, [fetchDepartments]);
 
   useEffect(() => {
+    // Debounce 400ms tránh gọi API liên tục khi đang gõ
+    const timer = setTimeout(() => {
+      setDebouncedSearch(filterSearch.trim());
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [filterSearch]);
+
+  useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- doi filter thi ve lai trang 1
     setRequestedPage(1);
-  }, [filterDepartmentId, filterIsActive]);
+  }, [filterDepartmentId, filterIsActive, debouncedSearch]);
 
   useEffect(() => {
     fetchAll({
       departmentId: filterDepartmentId ?? undefined,
       isActive: filterIsActive ?? undefined,
+      search: debouncedSearch || undefined,
       page: requestedPage,
       limit: 9,
     });
-  }, [fetchAll, filterDepartmentId, filterIsActive, requestedPage]);
+  }, [
+    fetchAll,
+    filterDepartmentId,
+    filterIsActive,
+    debouncedSearch,
+    requestedPage,
+  ]);
 
   async function handleCreate() {
     if (!name.trim() || !departmentId) return;
@@ -404,6 +421,16 @@ export default function PositionsPage() {
               <SelectItem value="false">Đã ẩn</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Tìm theo tên vị trí</p>
+          <Input
+            value={filterSearch}
+            onChange={(e) => setFilterSearch(e.target.value)}
+            placeholder="Nhập tên vị trí..."
+            className="w-48"
+          />
         </div>
       </div>
 

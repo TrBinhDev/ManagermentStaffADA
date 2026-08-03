@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   LayoutDashboard,
   Building2,
@@ -29,7 +30,9 @@ interface NavItem {
 const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Tổng quan",
-    items: [{ href: ROUTES.overview, label: "Tổng quan", icon: LayoutDashboard }],
+    items: [
+      { href: ROUTES.overview, label: "Tổng quan", icon: LayoutDashboard },
+    ],
   },
   {
     label: "Vận hành",
@@ -46,11 +49,21 @@ const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: "Quản trị",
     items: [
-      { href: ROUTES.managerAccounts, label: "Tài khoản quản lý", icon: ShieldCheck, ownerOnly: true },
+      {
+        href: ROUTES.managerAccounts,
+        label: "Tài khoản quản lý",
+        icon: ShieldCheck,
+        ownerOnly: true,
+      },
       { href: ROUTES.settings, label: "Cài đặt", icon: Settings },
     ],
   },
 ];
+
+interface IndicatorRect {
+  top: number;
+  height: number;
+}
 
 export function Sidebar({ open = true }: { open?: boolean }) {
   const pathname = usePathname();
@@ -59,6 +72,32 @@ export function Sidebar({ open = true }: { open?: boolean }) {
   const logout = useAuthStore((s) => s.logout);
 
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
+
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef<Map<string, HTMLAnchorElement>>(new Map());
+  const [indicator, setIndicator] = useState<IndicatorRect | null>(null);
+
+  const activeItem = NAV_GROUPS.flatMap((g) => g.items).find((item) =>
+    pathname.startsWith(item.href),
+  );
+
+  // Do vi tri/chieu cao cua item dang active so voi nav container, roi dat thanh
+  // indicator (absolute) theo dung vi tri do. Doi active thay doi -> "top" doi theo
+  // CSS transition ben duoi, tao hieu ung truot giua cac tab thay vi nhay cung.
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const activeEl = activeItem ? itemRefs.current.get(activeItem.href) : null;
+    if (!nav || !activeEl) {
+      setIndicator(null);
+      return;
+    }
+    const navRect = nav.getBoundingClientRect();
+    const itemRect = activeEl.getBoundingClientRect();
+    setIndicator({
+      top: itemRect.top - navRect.top + nav.scrollTop,
+      height: itemRect.height,
+    });
+  }, [activeItem?.href, role]);
 
   return (
     <aside
@@ -72,19 +111,38 @@ export function Sidebar({ open = true }: { open?: boolean }) {
       <div className="flex h-full w-64 flex-col">
         <div className="flex items-center gap-2 px-4 py-3.5">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-sidebar-foreground">Management Staff ADA</p>
-            <p className="truncate text-xs text-muted-foreground">Quản lý nhân viên</p>
+            <p className="truncate text-sm font-semibold text-sidebar-foreground">
+              Management Staff ADA
+            </p>
+            <p className="truncate text-xs text-muted-foreground">
+              Quản lý nhân viên
+            </p>
           </div>
           <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
         </div>
 
-        <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
+        <nav
+          ref={navRef}
+          className="relative flex-1 space-y-5 overflow-y-auto px-3 py-4"
+        >
+          {/* Thanh nen dam duy nhat, truot toi vi tri tab dang active */}
+          {indicator && (
+            <div
+              className="pointer-events-none absolute left-3 right-3 z-0 rounded-md bg-primary transition-[top,height] duration-200 ease-out"
+              style={{ top: indicator.top, height: indicator.height }}
+            />
+          )}
+
           {NAV_GROUPS.map((group) => {
-            const items = group.items.filter((item) => !item.ownerOnly || role === "OWNER");
+            const items = group.items.filter(
+              (item) => !item.ownerOnly || role === "OWNER",
+            );
             if (items.length === 0) return null;
             return (
               <div key={group.label} className="space-y-1">
-                <p className="px-2 text-xs font-medium text-muted-foreground">{group.label}</p>
+                <p className="px-2 text-xs font-medium text-muted-foreground">
+                  {group.label}
+                </p>
                 {items.map((item) => {
                   const active = pathname.startsWith(item.href);
                   const Icon = item.icon;
@@ -92,9 +150,15 @@ export function Sidebar({ open = true }: { open?: boolean }) {
                     <Link
                       key={item.href}
                       href={item.href}
+                      ref={(el) => {
+                        if (el) itemRefs.current.set(item.href, el);
+                        else itemRefs.current.delete(item.href);
+                      }}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+                        "relative z-10 flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors",
+                        active
+                          ? "font-medium text-primary-foreground"
+                          : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                       )}
                     >
                       <Icon className="size-4 shrink-0" />
@@ -115,8 +179,12 @@ export function Sidebar({ open = true }: { open?: boolean }) {
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">{role ?? "—"}</p>
-            <p className="truncate text-xs text-muted-foreground">{user?.email ?? ""}</p>
+            <p className="truncate text-sm font-medium text-sidebar-foreground">
+              {role ?? "—"}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user?.email ?? ""}
+            </p>
           </div>
           <LogOut className="size-4 shrink-0 text-muted-foreground" />
         </button>

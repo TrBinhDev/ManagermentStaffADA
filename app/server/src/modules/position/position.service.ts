@@ -14,6 +14,7 @@ import type {
 // Lấy danh sách vị trí có filter + phân trang
 export async function list({
   departmentId,
+  positionId,
   search,
   isActive,
   page,
@@ -21,8 +22,8 @@ export async function list({
 }: ListPositionQuery) {
   const skip = (page - 1) * limit; // Số bản ghi bỏ qua để phân trang
   const [data, total] = await Promise.all([
-    positionRepository.findMany(departmentId, search, isActive, skip, limit), // Lấy dữ liệu trang hiện tại
-    positionRepository.count(departmentId, search, isActive), // Đếm tổng số bản ghi (để tính tổng số trang)
+    positionRepository.findMany(departmentId, positionId, search, isActive, skip, limit), // Lấy dữ liệu trang hiện tại
+    positionRepository.count(departmentId, positionId, search, isActive), // Đếm tổng số bản ghi (để tính tổng số trang)
   ]);
 
   return { data, total, page, limit };
