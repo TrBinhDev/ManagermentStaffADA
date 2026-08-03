@@ -187,6 +187,8 @@ export default function DepartmentsPage() {
   const toast = useToast();
   const confirm = useConfirm();
   const [name, setName] = useState("");
+  const [filterSearch, setFilterSearch] = useState(""); // Ô nhập tìm theo tên phòng ban (raw input)
+  const [debouncedSearch, setDebouncedSearch] = useState(""); // Giá trị đã debounce, dùng để gọi API
   const [requestedPage, setRequestedPage] = useState(1);
   const [panelTarget, setPanelTarget] = useState<Department | null>(null);
 
@@ -195,8 +197,25 @@ export default function DepartmentsPage() {
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAll({ page: requestedPage, limit: 9 });
-  }, [fetchAll, requestedPage]);
+    // Debounce 400ms tránh gọi API liên tục khi đang gõ
+    const timer = setTimeout(() => {
+      setDebouncedSearch(filterSearch.trim());
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [filterSearch]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- doi search thi ve lai trang 1
+    setRequestedPage(1);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    fetchAll({
+      search: debouncedSearch || undefined,
+      page: requestedPage,
+      limit: 9,
+    });
+  }, [fetchAll, debouncedSearch, requestedPage]);
 
   async function handleCreate() {
     if (!name.trim()) return;
@@ -246,6 +265,20 @@ export default function DepartmentsPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold tracking-tight">Phòng ban</h1>
+
+      <div className="flex flex-wrap gap-4 rounded-xl border border-border bg-card p-3">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">
+            Tìm theo tên phòng ban
+          </p>
+          <Input
+            value={filterSearch}
+            onChange={(e) => setFilterSearch(e.target.value)}
+            placeholder="Nhập tên phòng ban..."
+            className="w-48"
+          />
+        </div>
+      </div>
 
       <div className="flex gap-2 rounded-xl border border-border bg-card p-3">
         <Input
