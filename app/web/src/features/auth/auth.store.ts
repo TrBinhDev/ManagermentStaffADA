@@ -10,8 +10,8 @@ interface AuthState {
   // true trong luc app moi load, dang goi /auth/refresh de khoi phuc session tu cookie.
   isBootstrapping: boolean;
   // Avatar cua chinh nguoi dang dang nhap - tach rieng khoi "user" (khong sua auth.types.ts),
-  // duoc set khi trang Profile/Detail fetch xong hoac sau khi upload thanh cong, de Sidebar
-  // doc chung 1 nguon va tu re-render, khong can F5.
+  // duoc set khi login/bootstrap, hoac khi trang Profile fetch/upload xong, de moi noi hien
+  // avatar (Sidebar, StaffSidebar,...) doc chung 1 nguon va tu re-render, khong can F5.
   avatarUrl: string | null;
 
   setAccessToken: (token: string) => void;
@@ -20,6 +20,23 @@ interface AuthState {
   logout: () => Promise<void>;
   bootstrap: () => Promise<void>;
   clear: () => void;
+}
+
+// Dung chung cho ca login() va bootstrap() - truoc day chi bootstrap() nap avatarUrl,
+// nen dang nhap truc tiep (khong qua F5) se khong co avatar cho toi khi user tu vao
+// trang Ho so. Dung dynamic import de tranh vong lap import (me.api -> apiClient co
+// the phu thuoc nguoc lai auth.store qua interceptor).
+async function loadAvatarUrl(set: (partial: Partial<AuthState>) => void) {
+  try {
+    const meApi = await import("@/features/me/me.api");
+    const profile = await meApi.fetchMyProfile();
+    if (profile) {
+      set({ avatarUrl: profile.avatarUrl ?? null });
+    }
+  } catch {
+    // Khong chan flow chinh (login/bootstrap) neu fetch avatar loi (vd user chua
+    // co ho so) - noi hien avatar se don gian fallback ve initials.
+  }
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -39,6 +56,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ accessToken: token, role, isAuthenticated: true });
     const user = await authApi.me();
     set({ user });
+    await loadAvatarUrl(set);
   },
 
   logout: async () => {
@@ -58,22 +76,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ accessToken: token, isAuthenticated: true });
       const user = await authApi.me();
       set({ user, role: user.role });
-
-      // Nap luon avatarUrl ngay luc bootstrap, khong phu thuoc viec user co
-      // ghe trang Profile hay khong - truoc day chi trang Profile moi set
-      // avatarUrl, nen sau moi lan F5/mo tab moi, Sidebar mat avatar cho toi
-      // khi user vao lai trang Profile. Dung dynamic import de tranh vong
-      // lap import (me.api -> apiClient co the phu thuoc nguoc lai auth.store).
-      try {
-        const meApi = await import("@/features/me/me.api");
-        const profile = await meApi.fetchMyProfile();
-        if (profile) {
-          set({ avatarUrl: profile.avatarUrl ?? null });
-        }
-      } catch {
-        // Khong chan bootstrap chinh neu fetch avatar loi (vd user chua co ho so) -
-        // Sidebar se don gian hien fallback initials, khong phai loi nghiem trong.
-      }
+      await loadAvatarUrl(set);
     } catch {
       set({
         accessToken: null,
