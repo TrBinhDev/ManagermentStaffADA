@@ -104,40 +104,55 @@ export default function MyProfilePage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold tracking-tight">Hồ sơ của tôi</h1>
       <p className="text-sm text-muted-foreground">
-        CCCD và một số thông tin định danh khác chỉ quản lý mới sửa được - liên hệ quản lý nếu cần cập nhật.
+        CCCD và một số thông tin định danh khác chỉ quản lý mới sửa được - liên
+        hệ quản lý nếu cần cập nhật.
       </p>
 
       {loading ? (
         <p className="text-sm text-muted-foreground">Đang tải...</p>
       ) : (
-        <div className="max-w-2xl space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4 border-b border-border pb-6">
-            <AvatarUploader
-              avatarUrl={avatarUrl}
-              fallbackText={initials}
-              size={80}
-              onUpload={handleAvatarUpload}
-            />
-            <div>
-              <p className="text-sm font-medium">{user?.email}</p>
-              <p className="text-xs text-muted-foreground">Di chuột vào ảnh để đổi avatar (JPEG/PNG/WEBP, tối đa 5MB)</p>
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex flex-col gap-8 md:flex-row md:items-start">
+            {/* Cột trái: avatar to, tách riêng khỏi form */}
+            <div className="flex shrink-0 flex-col items-center gap-3 md:w-56 md:border-r md:border-border md:pr-8">
+              <AvatarUploader
+                avatarUrl={avatarUrl}
+                fallbackText={initials}
+                size={160}
+                onUpload={handleAvatarUpload}
+              />
+              <div className="text-center">
+                <p className="text-sm font-medium">{user?.email}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Bấm vào ảnh để đổi avatar hoặc xem cỡ lớn
+                  <br />
+                  (JPEG/PNG/WEBP, tối đa 5MB)
+                </p>
+              </div>
+            </div>
+
+            {/* Cột phải: form thông tin */}
+            <div className="min-w-0 flex-1 space-y-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {FIELDS.map(({ key, label }) => (
+                  <div key={key} className="space-y-1">
+                    <Label htmlFor={key}>{label}</Label>
+                    <Input
+                      id={key}
+                      value={form[key] ?? ""}
+                      onChange={(e) => set(key, e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {error && <p className="text-sm text-destructive">{error}</p>}
+
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? "Đang lưu..." : "Lưu hồ sơ"}
+              </Button>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            {FIELDS.map(({ key, label }) => (
-              <div key={key} className="space-y-1">
-                <Label htmlFor={key}>{label}</Label>
-                <Input id={key} value={form[key] ?? ""} onChange={(e) => set(key, e.target.value)} />
-              </div>
-            ))}
-          </div>
-
-          {error && <p className="text-sm text-destructive">{error}</p>}
-
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? "Đang lưu..." : "Lưu hồ sơ"}
-          </Button>
         </div>
       )}
     </div>

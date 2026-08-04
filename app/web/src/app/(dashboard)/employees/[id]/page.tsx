@@ -302,38 +302,46 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
   ];
 
   return (
-    <div className="max-w-2xl space-y-6 rounded-lg border p-4">
-      <div className="flex items-center gap-4 border-b pb-4">
-        <AvatarUploader
-          avatarUrl={avatarUrl}
-          fallbackText="?"
-          size={72}
-          onUpload={handleAvatarUpload}
-        />
-        <p className="text-xs text-muted-foreground">
-          Di chuột vào ảnh để đổi avatar (JPEG/PNG/WEBP, tối đa 5MB)
-        </p>
-      </div>
+    <div className="rounded-lg border p-4">
+      <div className="flex flex-col gap-8 md:flex-row md:items-start">
+        {/* Cột trái: avatar to, tách riêng khỏi form */}
+        <div className="flex shrink-0 flex-col items-center gap-3 md:w-52 md:border-r md:pr-8">
+          <AvatarUploader
+            avatarUrl={avatarUrl}
+            fallbackText="?"
+            size={144}
+            onUpload={handleAvatarUpload}
+          />
+          <p className="text-center text-xs text-muted-foreground">
+            Bấm vào ảnh để đổi avatar hoặc xem cỡ lớn
+            <br />
+            (JPEG/PNG/WEBP, tối đa 5MB)
+          </p>
+        </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        {fields.map(({ key, label }) => (
-          <div key={key} className="space-y-1">
-            <Label htmlFor={key}>{label}</Label>
-            <Input
-              id={key}
-              value={form[key] ?? ""}
-              onChange={(e) => set(key, e.target.value)}
-              maxLength={key === "cccd" ? 12 : undefined}
-            />
+        {/* Cột phải: form thông tin */}
+        <div className="min-w-0 flex-1 space-y-6">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {fields.map(({ key, label }) => (
+              <div key={key} className="space-y-1">
+                <Label htmlFor={key}>{label}</Label>
+                <Input
+                  id={key}
+                  value={form[key] ?? ""}
+                  onChange={(e) => set(key, e.target.value)}
+                  maxLength={key === "cccd" ? 12 : undefined}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Đang lưu..." : "Lưu hồ sơ"}
+          </Button>
+        </div>
       </div>
-
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <Button onClick={handleSave} disabled={saving}>
-        {saving ? "Đang lưu..." : "Lưu hồ sơ"}
-      </Button>
     </div>
   );
 }
