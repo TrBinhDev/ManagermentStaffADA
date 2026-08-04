@@ -2,6 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../../middlewares/authenticate.middleware.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
 import { validate } from "../../validators/validate.js";
+import { uploadAvatarMiddleware } from "../../middlewares/upload-avatar.middleware.js";
 import { listEmployeeWorkScheduleQuerySchema } from "../work-schedule/work-schedule.schema.js";
 import { listEmployeePaymentsQuerySchema } from "../daily-payment/daily-payment.schema.js";
 import { meAttendanceQuerySchema, meUpdateProfileSchema } from "./me.schema.js";
@@ -42,3 +43,6 @@ meRouter.patch(
   validate(meUpdateProfileSchema),
   meController.updateProfile,
 );
+
+// PUT /avatar - Tự upload/thay avatar của chính mình, multer parse multipart trước khi vào controller
+meRouter.put("/avatar", uploadAvatarMiddleware, meController.uploadAvatar);

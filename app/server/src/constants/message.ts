@@ -46,6 +46,7 @@ export const Message = {
     INVALID_FILE_TYPE: "Chỉ chấp nhận file .jpg, .jpeg, .png, .webp",
     FILE_TOO_LARGE: "Dung lượng file tối đa 5MB",
     CCCD_REQUIRED: "Cần cung cấp cccd để tạo hồ sơ nhân viên lần đầu",
+    PROFILE_REQUIRED_FOR_AVATAR: "Cần tạo hồ sơ nhân viên trước khi upload avatar",
   },
 
   POSITION_SALARY_RATE: {

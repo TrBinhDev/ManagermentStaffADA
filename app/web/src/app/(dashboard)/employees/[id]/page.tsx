@@ -22,6 +22,7 @@ import type { DailyPaymentItem } from "@/features/daily-payment/daily-payment.ty
 import { useToast } from "@/components/toast/toast-context";
 import { useConfirm } from "@/components/confirm/confirm-context";
 import { getErrorMessage } from "@/lib/error";
+import { AvatarUploader } from "@/components/avatar/avatar-uploader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -206,8 +207,12 @@ function InfoTab({ employeeId }: { employeeId: string }) {
 
 function ProfileTab({ employeeId }: { employeeId: string }) {
   const toast = useToast();
+  const currentEmployeeId = useAuthStore((s) => s.user?.employeeId ?? null);
+  const setAvatarUrl = useAuthStore((s) => s.setAvatarUrl);
+  const isSelf = employeeId === currentEmployeeId; // OWNER/MANAGER dang xem trang chi tiet cua chinh minh
   const { data: profile, loading, refetch } = useEmployeeProfile(employeeId);
   const [form, setForm] = useState<UpsertEmployeeProfileInput>({});
+  const [avatarUrl, setAvatarUrlLocal] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -234,6 +239,7 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
         bankAccountHolder: profile.bankAccountHolder ?? undefined,
         note: profile.note ?? undefined,
       });
+      setAvatarUrlLocal(profile.avatarUrl ?? null);
     }
   }, [profile]);
 
@@ -242,6 +248,14 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
     value: string,
   ) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  async function handleAvatarUpload(file: File) {
+    const updated = await employeeProfileApi.uploadAvatar(employeeId, file);
+    const newUrl = updated.avatarUrl ?? null;
+    setAvatarUrlLocal(newUrl);
+    if (isSelf) setAvatarUrl(newUrl); // Dang sua avatar cua chinh minh -> dong bo Sidebar ngay, khong can F5
+    return newUrl ?? "";
   }
 
   async function handleSave() {
@@ -288,7 +302,19 @@ function ProfileTab({ employeeId }: { employeeId: string }) {
   ];
 
   return (
-    <div className="max-w-2xl space-y-4 rounded-lg border p-4">
+    <div className="max-w-2xl space-y-6 rounded-lg border p-4">
+      <div className="flex items-center gap-4 border-b pb-4">
+        <AvatarUploader
+          avatarUrl={avatarUrl}
+          fallbackText="?"
+          size={72}
+          onUpload={handleAvatarUpload}
+        />
+        <p className="text-xs text-muted-foreground">
+          Di chuột vào ảnh để đổi avatar (JPEG/PNG/WEBP, tối đa 5MB)
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         {fields.map(({ key, label }) => (
           <div key={key} className="space-y-1">

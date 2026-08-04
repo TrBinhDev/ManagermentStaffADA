@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import * as meApi from "@/features/me/me.api";
 import type { MeUpdateProfileInput } from "@/features/me/me.types";
+import { useAuthStore } from "@/features/auth/auth.store";
 import { useToast } from "@/components/toast/toast-context";
 import { getErrorMessage } from "@/lib/error";
+import { AvatarUploader } from "@/components/avatar/avatar-uploader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,10 +31,15 @@ const FIELDS: Array<{ key: keyof MeUpdateProfileInput; label: string }> = [
 
 export default function MyProfilePage() {
   const toast = useToast();
+  const user = useAuthStore((s) => s.user);
+  const setAvatarUrl = useAuthStore((s) => s.setAvatarUrl); // Ghi vao store chung -> Sidebar tu re-render, khong can F5
   const [form, setForm] = useState<MeUpdateProfileInput>({});
+  const [avatarUrl, setAvatarUrlLocal] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
 
   const refetch = useCallback(async () => {
     setLoading(true);
@@ -55,9 +62,11 @@ export default function MyProfilePage() {
         bankAccountNumber: profile.bankAccountNumber ?? undefined,
         bankAccountHolder: profile.bankAccountHolder ?? undefined,
       });
+      setAvatarUrlLocal(profile.avatarUrl ?? null);
+      setAvatarUrl(profile.avatarUrl ?? null); // Dong bo luon vao Sidebar khi vao trang lan dau
     }
     setLoading(false);
-  }, []);
+  }, [setAvatarUrl]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount, refetch tu setState ben trong
@@ -66,6 +75,14 @@ export default function MyProfilePage() {
 
   function set<K extends keyof MeUpdateProfileInput>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  async function handleAvatarUpload(file: File) {
+    const profile = await meApi.uploadMyAvatar(file);
+    const newUrl = profile.avatarUrl ?? null;
+    setAvatarUrlLocal(newUrl);
+    setAvatarUrl(newUrl); // Sidebar doc chung state nay -> tu doi anh ngay, khong can F5
+    return newUrl ?? "";
   }
 
   async function handleSave() {
@@ -93,7 +110,20 @@ export default function MyProfilePage() {
       {loading ? (
         <p className="text-sm text-muted-foreground">Đang tải...</p>
       ) : (
-        <div className="max-w-2xl space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
+        <div className="max-w-2xl space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4 border-b border-border pb-6">
+            <AvatarUploader
+              avatarUrl={avatarUrl}
+              fallbackText={initials}
+              size={80}
+              onUpload={handleAvatarUpload}
+            />
+            <div>
+              <p className="text-sm font-medium">{user?.email}</p>
+              <p className="text-xs text-muted-foreground">Di chuột vào ảnh để đổi avatar (JPEG/PNG/WEBP, tối đa 5MB)</p>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             {FIELDS.map(({ key, label }) => (
               <div key={key} className="space-y-1">

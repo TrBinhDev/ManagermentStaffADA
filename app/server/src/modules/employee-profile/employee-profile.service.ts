@@ -6,6 +6,11 @@ import {
 } from "../../errors/AppError.js";
 import { hashCccd } from "../../utils/hash.util.js";
 import { encrypt, decrypt } from "../../utils/crypto.util.js";
+import {
+  uploadAvatarToR2,
+  deleteAvatarFromR2,
+  extractKeyFromUrl,
+} from "../../utils/r2.util.js";
 import * as employeeProfileRepository from "./employee-profile.repository.js";
 import type { UpsertEmployeeProfileInput } from "./employee-profile.schema.js";
 
@@ -93,4 +98,39 @@ export async function upsertProfile(
   }
 
   return getProfile(employeeId); // Trả về hồ sơ mới nhất sau khi tạo/cập nhật (đã giải mã CCCD)
+}
+
+// Hàm upload/thay avatar cho nhân viên - yêu cầu hồ sơ đã tồn tại (avatarUrl thuộc bảng EmployeeProfile)
+export async function uploadAvatar(
+  employeeId: string,
+  file: Express.Multer.File,
+) {
+  const employee = await employeeProfileRepository.findEmployeeById(employeeId);
+  if (!employee) {
+    throw new NotFoundError(Message.EMPLOYEE.NOT_FOUND, "EMPLOYEE_NOT_FOUND");
+  }
+
+  const existingProfile =
+    await employeeProfileRepository.findByEmployeeId(employeeId);
+  if (!existingProfile) {
+    // avatarUrl nằm ở bảng EmployeeProfile -> phải có hồ sơ (đã nhập CCCD) trước mới upload được avatar
+    throw new BadRequestError(
+      Message.EMPLOYEE_PROFILE.PROFILE_REQUIRED_FOR_AVATAR,
+      "PROFILE_REQUIRED_FOR_AVATAR",
+    );
+  }
+
+  const { url } = await uploadAvatarToR2(file.buffer, file.mimetype);
+
+  // Xóa avatar cũ trên R2 (nếu có và không phải ảnh mặc định) để tránh rác tích tụ trong bucket
+  const oldKey = extractKeyFromUrl(existingProfile.avatarUrl ?? "");
+  if (oldKey) {
+    await deleteAvatarFromR2(oldKey).catch(() => {
+      // Không chặn luồng chính nếu xóa file cũ thất bại (vd: file đã bị xóa thủ công trước đó)
+    });
+  }
+
+  await employeeProfileRepository.updateAvatarUrl(employeeId, url);
+
+  return getProfile(employeeId);
 }

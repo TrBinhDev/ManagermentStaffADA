@@ -2,13 +2,24 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Clock, Wallet, User, LogOut, ChevronsUpDown } from "lucide-react";
+import {
+  CalendarDays,
+  Clock,
+  Wallet,
+  User,
+  LogOut,
+  ChevronsUpDown,
+} from "lucide-react";
 import { useAuthStore } from "@/features/auth/auth.store";
 import { ROUTES } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: ROUTES.myWorkSchedule, label: "Lịch làm của tôi", icon: CalendarDays },
+  {
+    href: ROUTES.myWorkSchedule,
+    label: "Lịch làm của tôi",
+    icon: CalendarDays,
+  },
   { href: ROUTES.myAttendance, label: "Chấm công của tôi", icon: Clock },
   { href: ROUTES.myPayments, label: "Lương của tôi", icon: Wallet },
   { href: ROUTES.myProfile, label: "Hồ sơ của tôi", icon: User },
@@ -17,6 +28,7 @@ const NAV_ITEMS = [
 export function StaffSidebar({ open = true }: { open?: boolean }) {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+  const avatarUrl = useAuthStore((s) => s.avatarUrl); // Doc chung store voi trang Profile - upload xong la tu re-render, khong can F5
   const logout = useAuthStore((s) => s.logout);
 
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
@@ -31,7 +43,9 @@ export function StaffSidebar({ open = true }: { open?: boolean }) {
       <div className="flex h-full w-64 flex-col">
         <div className="flex items-center gap-2 px-4 py-3.5">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-sidebar-foreground">Management Staff ADA</p>
+            <p className="truncate text-sm font-semibold text-sidebar-foreground">
+              Management Staff ADA
+            </p>
             <p className="truncate text-xs text-muted-foreground">Nhân viên</p>
           </div>
           <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
@@ -47,7 +61,8 @@ export function StaffSidebar({ open = true }: { open?: boolean }) {
                 href={item.href}
                 className={cn(
                   "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  active && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+                  active &&
+                    "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
                 )}
               >
                 <Icon className="size-4 shrink-0" />
@@ -61,12 +76,25 @@ export function StaffSidebar({ open = true }: { open?: boolean }) {
           onClick={() => logout()}
           className="mx-2 mb-2 flex items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-sidebar-accent"
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
-            {initials}
+          <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- avatar tu R2 (domain ngoai)
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className="size-full object-cover"
+              />
+            ) : (
+              initials
+            )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-sidebar-foreground">STAFF</p>
-            <p className="truncate text-xs text-muted-foreground">{user?.email ?? ""}</p>
+            <p className="truncate text-sm font-medium text-sidebar-foreground">
+              STAFF
+            </p>
+            <p className="truncate text-xs text-muted-foreground">
+              {user?.email ?? ""}
+            </p>
           </div>
           <LogOut className="size-4 shrink-0 text-muted-foreground" />
         </button>

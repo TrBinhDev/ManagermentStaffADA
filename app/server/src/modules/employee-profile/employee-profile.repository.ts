@@ -45,3 +45,11 @@ export function update(
 ) {
   return prisma.employeeProfile.update({ where: { employeeId }, data });
 }
+
+// Cập nhật riêng avatarUrl (dùng cho API upload avatar, tách khỏi upsertProfile chung)
+export function updateAvatarUrl(employeeId: string, avatarUrl: string) {
+  return prisma.employeeProfile.update({
+    where: { employeeId },
+    data: { avatarUrl },
+  });
+}

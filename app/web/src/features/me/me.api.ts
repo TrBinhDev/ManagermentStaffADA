@@ -6,18 +6,34 @@ import type { EmployeePaymentsResult } from "@/features/daily-payment/daily-paym
 import type { EmployeeProfile } from "@/features/employee-profile/employee-profile.types";
 import type { MeUpdateProfileInput, MeAttendanceParams } from "./me.types";
 
-export async function fetchMyWorkSchedule(month: number, year: number): Promise<EmployeeWorkScheduleItem[]> {
-  const res = await apiClient.get<EmployeeWorkScheduleItem[]>("/me/work-schedule", { params: { month, year } });
+export async function fetchMyWorkSchedule(
+  month: number,
+  year: number,
+): Promise<EmployeeWorkScheduleItem[]> {
+  const res = await apiClient.get<EmployeeWorkScheduleItem[]>(
+    "/me/work-schedule",
+    { params: { month, year } },
+  );
   return res.data;
 }
 
-export async function fetchMyAttendance(params: MeAttendanceParams): Promise<PaginatedResult<AttendanceItem>> {
-  const res = await apiClient.get<PaginatedResult<AttendanceItem>>("/me/attendance", { params });
+export async function fetchMyAttendance(
+  params: MeAttendanceParams,
+): Promise<PaginatedResult<AttendanceItem>> {
+  const res = await apiClient.get<PaginatedResult<AttendanceItem>>(
+    "/me/attendance",
+    { params },
+  );
   return res.data;
 }
 
-export async function fetchMyPayments(month: number, year: number): Promise<EmployeePaymentsResult> {
-  const res = await apiClient.get<EmployeePaymentsResult>("/me/payments", { params: { month, year } });
+export async function fetchMyPayments(
+  month: number,
+  year: number,
+): Promise<EmployeePaymentsResult> {
+  const res = await apiClient.get<EmployeePaymentsResult>("/me/payments", {
+    params: { month, year },
+  });
   return res.data;
 }
 
@@ -26,7 +42,19 @@ export async function fetchMyProfile(): Promise<EmployeeProfile | null> {
   return res.data;
 }
 
-export async function updateMyProfile(input: MeUpdateProfileInput): Promise<EmployeeProfile> {
+export async function updateMyProfile(
+  input: MeUpdateProfileInput,
+): Promise<EmployeeProfile> {
   const res = await apiClient.patch<EmployeeProfile>("/me/profile", input);
+  return res.data;
+}
+
+// Tự upload/thay avatar của chính mình - gửi multipart/form-data, field name phải là "avatar" (khớp multer bên BE)
+export async function uploadMyAvatar(file: File): Promise<EmployeeProfile> {
+  const formData = new FormData();
+  formData.append("avatar", file);
+  const res = await apiClient.put<EmployeeProfile>("/me/avatar", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data;
 }

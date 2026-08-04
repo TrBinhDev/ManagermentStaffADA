@@ -39,3 +39,9 @@ export function getProfile(employeeId: string) {
 export function updateProfile(employeeId: string, input: MeUpdateProfileInput) {
   return employeeProfileService.upsertProfile(employeeId, input);
 }
+
+// Tự upload/thay avatar của chính mình -> ủy quyền lại cho employeeProfileService.uploadAvatar,
+// employeeId lấy từ token (req.user) ở controller nên STAFF không thể đổi avatar của người khác
+export function uploadAvatar(employeeId: string, file: Express.Multer.File) {
+  return employeeProfileService.uploadAvatar(employeeId, file);
+}

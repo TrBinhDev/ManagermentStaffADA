@@ -69,6 +69,8 @@ export function Sidebar({ open = true }: { open?: boolean }) {
   const pathname = usePathname();
   const role = useAuthStore((s) => s.role);
   const user = useAuthStore((s) => s.user);
+  const avatarUrl = useAuthStore((s) => s.avatarUrl); // Doc chung store voi trang Profile - upload xong la Sidebar tu re-render
+  console.log("[Sidebar] avatarUrl:", avatarUrl);
   const logout = useAuthStore((s) => s.logout);
 
   const initials = user?.email ? user.email.slice(0, 2).toUpperCase() : "??";
@@ -175,8 +177,17 @@ export function Sidebar({ open = true }: { open?: boolean }) {
           onClick={() => logout()}
           className="flex items-center gap-2.5 rounded-md px-2 py-1.5 mx-2 mb-2 text-left transition-colors hover:bg-sidebar-accent"
         >
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
-            {initials}
+          <div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary text-xs font-medium text-secondary-foreground">
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- avatar tu R2 (domain ngoai)
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className="size-full object-cover"
+              />
+            ) : (
+              initials
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-sidebar-foreground">

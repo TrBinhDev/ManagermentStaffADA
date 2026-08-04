@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { HttpStatus } from "../../constants/httpStatus.js";
+import { BadRequestError } from "../../errors/AppError.js";
 import * as meService from "./me.service.js";
 import type { ListEmployeeWorkScheduleQuery } from "../work-schedule/work-schedule.schema.js";
 import type { ListEmployeePaymentsQuery } from "../daily-payment/daily-payment.schema.js";
@@ -48,6 +49,20 @@ export const updateProfile = asyncHandler(
   async (req: Request, res: Response) => {
     const body = req.body as MeUpdateProfileInput;
     const result = await meService.updateProfile(req.user!.employeeId!, body);
+    res.status(HttpStatus.OK).json(result);
+  },
+);
+
+// Controller tự upload/thay avatar của chính người đang đăng nhập - file do multer parse sẵn vào req.file
+export const uploadAvatar = asyncHandler(
+  async (req: Request, res: Response) => {
+    if (!req.file) {
+      throw new BadRequestError("Thiếu file avatar", "AVATAR_FILE_REQUIRED");
+    }
+    const result = await meService.uploadAvatar(
+      req.user!.employeeId!,
+      req.file,
+    );
     res.status(HttpStatus.OK).json(result);
   },
 );
