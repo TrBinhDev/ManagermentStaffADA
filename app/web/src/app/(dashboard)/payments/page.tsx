@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import * as dailyPaymentApi from "@/features/daily-payment/daily-payment.api";
 import type { PaymentSummaryEntry } from "@/features/daily-payment/daily-payment.types";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Hook dem so tang dan tu 0 -> target, dung requestAnimationFrame, easeOutCubic cho muot.
 function useCountUp(target: number, duration = 800) {
@@ -41,10 +48,26 @@ function AnimatedNumber({
   return <p className={className}>{format(value)}</p>;
 }
 
+// Debounce 1 giá trị bất kỳ - dùng cho search để không gọi API mỗi lần gõ phím
+function useDebouncedValue<T>(value: T, delay = 400): T {
+  const [debounced, setDebounced] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debounced;
+}
+
 export default function PaymentsPage() {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebouncedValue(search);
+  const [sortBy, setSortBy] = useState<"name" | "amount">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [data, setData] = useState<PaymentSummaryEntry[]>([]);
   const [grandTotal, setGrandTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -53,16 +76,38 @@ export default function PaymentsPage() {
     let cancelled = false;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount/thay-doi-filter, refetch tu setState ben trong
     setLoading(true);
-    dailyPaymentApi.fetchAllPayments(month, year).then((result) => {
+
+    // Gọi song song 2 API riêng: danh sách nhân viên (có filter/search/sort/phân trang) và tổng lương toàn nhà hàng (1 con số)
+    Promise.all([
+      dailyPaymentApi.fetchAllPayments(month, year, {
+        search: debouncedSearch || undefined,
+        sortBy,
+        sortOrder,
+      }),
+      dailyPaymentApi.fetchPaymentsSummary(month, year),
+    ]).then(([listResult, summaryResult]) => {
       if (cancelled) return;
-      setData(result.data);
-      setGrandTotal(result.grandTotal);
+      setData(listResult.data);
+      setGrandTotal(summaryResult.grandTotal);
       setLoading(false);
     });
+
     return () => {
       cancelled = true;
     };
-  }, [month, year]);
+  }, [month, year, debouncedSearch, sortBy, sortOrder]);
+
+  // Dropdown gộp sortBy + sortOrder thành 1 option duy nhất cho dễ chọn
+  const sortValue = `${sortBy}-${sortOrder}`;
+  function handleSortChange(value: string | null) {
+    if (!value) return;
+    const [field, order] = value.split("-") as [
+      "name" | "amount",
+      "asc" | "desc",
+    ];
+    setSortBy(field);
+    setSortOrder(order);
+  }
 
   return (
     <div className="space-y-6">
@@ -89,6 +134,39 @@ export default function PaymentsPage() {
             onChange={(e) => setYear(Number(e.target.value))}
           />
         </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Tìm nhân viên</p>
+          <Input
+            type="text"
+            placeholder="Tên nhân viên..."
+            className="w-48"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Sắp xếp</p>
+          <Select value={sortValue} onValueChange={handleSortChange}>
+            <SelectTrigger className="w-40">
+              <SelectValue>
+                {(value: string) =>
+                  ({
+                    "name-asc": "Tên A → Z",
+                    "name-desc": "Tên Z → A",
+                    "amount-asc": "Lương thấp → cao",
+                    "amount-desc": "Lương cao → thấp",
+                  })[value] ?? value
+                }
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name-asc">Tên A → Z</SelectItem>
+              <SelectItem value="name-desc">Tên Z → A</SelectItem>
+              <SelectItem value="amount-asc">Lương thấp → cao</SelectItem>
+              <SelectItem value="amount-desc">Lương cao → thấp</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
@@ -104,7 +182,9 @@ export default function PaymentsPage() {
 
       {!loading && data.length === 0 && (
         <p className="text-sm text-muted-foreground">
-          Chưa có ai được trả lương trong tháng này.
+          {search
+            ? "Không tìm thấy nhân viên nào khớp."
+            : "Chưa có ai được trả lương trong tháng này."}
         </p>
       )}
 

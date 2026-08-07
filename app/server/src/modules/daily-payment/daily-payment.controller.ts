@@ -5,6 +5,7 @@ import * as dailyPaymentService from "./daily-payment.service.js";
 import type {
   ListEmployeePaymentsQuery,
   ListAllPaymentsQuery,
+  SummaryQuery,
 } from "./daily-payment.schema.js";
 
 // Controller lấy danh sách lương ngày của một nhân viên cụ thể
@@ -24,5 +25,12 @@ export const listByEmployee = asyncHandler(
 export const listAll = asyncHandler(async (req: Request, res: Response) => {
   const query = req.query as unknown as ListAllPaymentsQuery; // Tham số lọc/phân trang từ query string
   const result = await dailyPaymentService.listAll(query);
+  res.status(HttpStatus.OK).json(result);
+});
+
+// Controller lấy tổng lương toàn nhà hàng trong tháng - 1 con số duy nhất, không phân trang
+export const getSummary = asyncHandler(async (req: Request, res: Response) => {
+  const query = req.query as unknown as SummaryQuery; // Tham số month/year từ query string
+  const result = await dailyPaymentService.getSummary(query);
   res.status(HttpStatus.OK).json(result);
 });

@@ -22,7 +22,15 @@ export interface PaymentSummaryEntry {
   totalHours: number;
 }
 
+// Kết quả của GET /payments - danh sách nhân viên kèm lương, có phân trang (KHÔNG có grandTotal)
 export interface AllPaymentsResult {
   data: PaymentSummaryEntry[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// Kết quả của GET /payments/summary - tổng lương toàn nhà hàng, 1 con số duy nhất
+export interface PaymentSummaryResult {
   grandTotal: number;
 }

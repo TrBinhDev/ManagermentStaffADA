@@ -106,6 +106,10 @@ const CHART_TOOLTIP_STYLE = {
   fontSize: 12,
 };
 
+// Số lượng lương tối đa lấy về cho trang overview - đủ lớn để bảng "đầy đủ" không bị cắt
+// mất nhân viên khi nhà hàng có nhiều người hơn limit mặc định (20) của /payments.
+const OVERVIEW_PAYMENTS_LIMIT = 100;
+
 export default function OverviewPage() {
   const [today] = useState(() => toDateOnly(new Date()));
   const [month] = useState(() => new Date().getMonth() + 1);
@@ -127,7 +131,8 @@ export default function OverviewPage() {
         shifts,
         schedule,
         attendance,
-        paymentsResult,
+        paymentsListResult,
+        paymentsSummaryResult,
       ] = await Promise.all([
         employeeApi.fetchEmployees({ status: "ACTIVE", limit: 100 }),
         employeeApi.fetchEmployees({ status: "RESIGNED", limit: 1 }),
@@ -136,7 +141,12 @@ export default function OverviewPage() {
         shiftApi.fetchShifts({ isActive: true, limit: 1 }),
         workScheduleApi.fetchAllWorkSchedule(month, year),
         attendanceApi.fetchAttendance({ from: today, to: today, limit: 100 }),
-        dailyPaymentApi.fetchAllPayments(month, year),
+        // Danh sách lương từng nhân viên - lấy limit lớn để không bị cắt bớt ở bảng đầy đủ
+        dailyPaymentApi.fetchAllPayments(month, year, {
+          limit: OVERVIEW_PAYMENTS_LIMIT,
+        }),
+        // Tổng lương toàn nhà hàng - endpoint riêng, tách khỏi danh sách phân trang ở trên
+        dailyPaymentApi.fetchPaymentsSummary(month, year),
       ]);
       if (cancelled) return;
 
@@ -157,10 +167,12 @@ export default function OverviewPage() {
         shifts: shifts.total,
         scheduledToday: scheduledTodayIds.size,
         checkedInToday,
-        grandTotal: paymentsResult.grandTotal,
+        grandTotal: paymentsSummaryResult.grandTotal,
       });
       setPayments(
-        [...paymentsResult.data].sort((a, b) => b.totalAmount - a.totalAmount),
+        [...paymentsListResult.data].sort(
+          (a, b) => b.totalAmount - a.totalAmount,
+        ),
       );
       setLoading(false);
     }
